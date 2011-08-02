@@ -1,7 +1,4 @@
 cmake_minimum_required(VERSION 2.6)
-    if(COMMAND cmake_policy)
-      cmake_policy(SET CMP0003 NEW)
-    endif(COMMAND cmake_policy)
 
 PROJECT(vtkPointSetOutlierRemoval)
 ENABLE_TESTING()
@@ -10,6 +7,10 @@ INCLUDE_DIRECTORIES(${INCLUDE_DIRECTORIES} ../)
 
 FIND_PACKAGE(VTK REQUIRED)
 INCLUDE(${VTK_USE_FILE})
+
+if (!VTK_USE_BOOST)
+  MESSAGE(SEND_ERROR "VTK must be buile with VTK_USE_BOOST=ON.")
+endif ()
 
 SET(BUILD_PARAVIEW_PLUGIN OFF CACHE BOOL "Build Paraview plugin?")
 
@@ -46,28 +47,28 @@ endif(BUILD_PARAVIEW_PLUGIN)
 ############ VTK Filters ####################
 ADD_EXECUTABLE(vtkPointSetOutlierRemovalExample ${PointSetProcessingDir}/vtkPointSetOutlierRemovalExample.cxx
 ${PointSetProcessingDir}/vtkPointSetOutlierRemoval.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetOutlierRemovalExample vtkHybrid )
+TARGET_LINK_LIBRARIES(vtkPointSetOutlierRemovalExample ${VTK_LIBRARIES} )
 
 ADD_EXECUTABLE(vtkPointSetCurvatureEstimationExample ${PointSetProcessingDir}/vtkPointSetCurvatureEstimationExample.cxx
 ${PointSetProcessingDir}/vtkPointSetCurvatureEstimation.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetCurvatureEstimationExample vtkHybrid )
+TARGET_LINK_LIBRARIES(vtkPointSetCurvatureEstimationExample ${VTK_LIBRARIES} )
 
 ADD_EXECUTABLE(vtkPointSetNormalEstimationExample ${PointSetProcessingDir}/vtkPointSetNormalEstimationExample.cxx
 ${PointSetProcessingDir}/vtkPointSetNormalEstimation.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetNormalEstimationExample vtkHybrid )
+TARGET_LINK_LIBRARIES(vtkPointSetNormalEstimationExample ${VTK_LIBRARIES} )
 
 ADD_EXECUTABLE(vtkPointSetNormalOrientationExample ${PointSetProcessingDir}/vtkPointSetNormalOrientationExample.cxx
 ${PointSetProcessingDir}/vtkPointSetNormalOrientation.cxx 
 ${PointSetProcessingDir}/vtkRiemannianGraphFilter.cxx 
 ${PointSetProcessingDir}/vtkEuclideanMinimumSpanningTree.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetNormalOrientationExample vtkHybrid vtkInfovis)
+TARGET_LINK_LIBRARIES(vtkPointSetNormalOrientationExample ${VTK_LIBRARIES})
 
 
 
 ############### Tests ########################
 # Outlier Removal
 ADD_EXECUTABLE(vtkPointSetOutlierRemovalTest ${PointSetProcessingDir}/vtkPointSetOutlierRemovalTest.cxx ${PointSetProcessingDir}/vtkPointSetOutlierRemoval.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetOutlierRemovalTest vtkHybrid )
+TARGET_LINK_LIBRARIES(vtkPointSetOutlierRemovalTest ${VTK_LIBRARIES} )
 ADD_TEST(vtkPointSetOutlierRemovalTest vtkPointSetOutlierRemovalTest ${DataDir}/vtkPointSetOutlierRemoval_Input.vtp ${DataDir}/vtkPointSetOutlierRemoval_GroundTruth.vtp)
 
 # Curvature Estimation
@@ -75,13 +76,13 @@ ADD_EXECUTABLE(vtkPointSetCurvatureEstimationTest ${PointSetProcessingDir}/vtkPo
 ${PointSetProcessingDir}/vtkPointSetNormalEstimation.cxx
 ${PointSetProcessingDir}/vtkPointSetCurvatureEstimation.cxx
 )
-TARGET_LINK_LIBRARIES(vtkPointSetCurvatureEstimationTest vtkHybrid )
+TARGET_LINK_LIBRARIES(vtkPointSetCurvatureEstimationTest ${VTK_LIBRARIES} )
 ADD_TEST(vtkPointSetCurvatureEstimationTest vtkPointSetCurvatureEstimationTest ${DataDir}/vtkPointSetCurvatureEstimation_Input.vtp ${DataDir}/vtkPointSetCurvatureEstimation_GroundTruth.vtp)
 
 # Normal Estimation
 ADD_EXECUTABLE(vtkPointSetNormalEstimationTest ${PointSetProcessingDir}/vtkPointSetNormalEstimationTest.cxx 
 ${PointSetProcessingDir}/vtkPointSetNormalEstimation.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetNormalEstimationTest vtkHybrid )
+TARGET_LINK_LIBRARIES(vtkPointSetNormalEstimationTest ${VTK_LIBRARIES} )
 ADD_TEST(vtkPointSetNormalEstimationTest vtkPointSetNormalEstimationTest ${DataDir}/vtkPointSetNormalEstimation_Input.vtp ${DataDir}/vtkPointSetNormalEstimation_GroundTruth.vtp)
 
 # Normal Orientation
@@ -89,5 +90,5 @@ ADD_EXECUTABLE(vtkPointSetNormalOrientationTest ${PointSetProcessingDir}/vtkPoin
 ${PointSetProcessingDir}/vtkPointSetNormalOrientation.cxx
 ${PointSetProcessingDir}/vtkEuclideanMinimumSpanningTree.cxx  
 ${PointSetProcessingDir}/vtkRiemannianGraphFilter.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetNormalOrientationTest vtkHybrid vtkInfovis)
+TARGET_LINK_LIBRARIES(vtkPointSetNormalOrientationTest ${VTK_LIBRARIES})
 ADD_TEST(vtkPointSetNormalOrientationTest vtkPointSetNormalOrientationTest ${DataDir}/vtkPointSetNormalOrientation_Input.vtp ${DataDir}/vtkPointSetNormalOrientation_GroundTruth.vtp)
