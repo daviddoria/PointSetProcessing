@@ -1,0 +1,37 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ================================================================== -->
+    <SourceProxy name="NormalEstimation" class="vtkPointSetNormalEstimation" label="NormalEstimation">
+      <Documentation
+         long_help="Estimate normals of a set of points."
+         short_help="Estimate normals of a set of points.">
+      </Documentation>
+
+      <InputProperty
+         name="Input"
+         command="AddInputConnection"
+         clean_command="RemoveAllInputs">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the input point set.
+        </Documentation>
+      </InputProperty>
+
+         <IntVectorProperty
+                            name="kNeighbors"
+                              command="SetkNeighbors"
+                              number_of_elements="1"
+                              default_values="5">
+         </IntVectorProperty>
+
+    </SourceProxy>
+    <!-- End OutlierRemoval -->
+  </ProxyGroup>
+  <!-- End Filters Group -->
+</ServerManagerConfiguration>

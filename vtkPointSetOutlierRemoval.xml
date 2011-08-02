@@ -1,0 +1,38 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ================================================================== -->
+    <SourceProxy name="ICP" class="vtkPointSetOutlierRemoval" label="OutlierRemoval">
+      <Documentation
+         long_help="Remove outliers from a set of points."
+         short_help="Remove outliers from a set of points.">
+      </Documentation>
+
+      <InputProperty
+         name="Input"
+         command="AddInputConnection"
+         clean_command="RemoveAllInputs">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the input point set.
+        </Documentation>
+      </InputProperty>
+
+         <DoubleVectorProperty
+                            name="PercentToRemove"
+                              command="SetPercentToRemove"
+                              number_of_elements="1"
+                              default_values="0.1">
+        <DoubleRangeDomain name="range" min="0.0" max="1.0" />
+         </DoubleVectorProperty>
+
+    </SourceProxy>
+    <!-- End OutlierRemoval -->
+  </ProxyGroup>
+  <!-- End Filters Group -->
+</ServerManagerConfiguration>

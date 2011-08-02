@@ -1,0 +1,45 @@
+<ServerManagerConfiguration>
+  <ProxyGroup name="filters">
+    <!-- ================================================================== -->
+    <SourceProxy name="CurvatureEstimation" class="vtkPointSetCurvatureEstimation" label="CurvatureEstimation">
+      <Documentation
+         long_help="Estimate curvature of a set of points."
+         short_help="Estimate curvature of a set of points.">
+      </Documentation>
+
+      <InputProperty
+         name="Input"
+         command="AddInputConnection"
+         clean_command="RemoveAllInputs">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+        <DataTypeDomain name="input_type">
+          <DataType value="vtkPolyData"/>
+        </DataTypeDomain>
+        <Documentation>
+          Set the input point set.
+        </Documentation>
+      </InputProperty>
+
+         <DoubleVectorProperty
+                            name="Neighbor Radius"
+                              command="SetRadius"
+                              number_of_elements="1"
+                              default_values="1.0">
+         </DoubleVectorProperty>
+
+         <IntVectorProperty
+                           name="Use Auto Radius"
+                           command="SetUseAutoRadius"
+                           number_of_elements="1"
+                           default_values="1">
+           <BooleanDomain name="bool"/>
+        </IntVectorProperty>
+
+    </SourceProxy>
+    <!-- End CurvatureEstimation -->
+  </ProxyGroup>
+  <!-- End Filters Group -->
+</ServerManagerConfiguration>
