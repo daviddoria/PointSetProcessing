@@ -13,13 +13,13 @@ int main (int argc, char *argv[])
 {
   if(argc != 4)
     {
-    vtkstd::cout << "Required arguments: InputFile(vtp) OutputFile(graph) OutputFile(vtp)" << vtkstd::endl;
+    std::cout << "Required arguments: InputFile(vtp) OutputFile(graph) OutputFile(vtp)" << std::endl;
     exit(-1);
     }
     
-  vtkstd::string inputFilename = argv[1];
-  vtkstd::string outputGraphFilename = argv[2];
-  vtkstd::string outputPolyDataFilename = argv[3];
+  std::string inputFilename = argv[1];
+  std::string outputGraphFilename = argv[2];
+  std::string outputPolyDataFilename = argv[3];
     
   vtkSmartPointer<vtkXMLPolyDataReader> inputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   inputReader->SetFileName(inputFilename.c_str());
@@ -41,22 +41,22 @@ int main (int argc, char *argv[])
   
   vtkGraph* riemannianGraph = riemannianGraphFilter->GetOutput();
   
-  //write the graph to a file
+  // Write the graph to a file
   vtkSmartPointer<vtkGraphWriter> graphWriter = vtkSmartPointer<vtkGraphWriter>::New();
   graphWriter->SetInput(riemannianGraph);
   graphWriter->SetFileName(outputGraphFilename.c_str());
   graphWriter->Write();
   
-  //convert the graph to a polydata
+  // Convert the graph to a polydata
   vtkSmartPointer<vtkGraphToPolyData> graphToPolyDataFilter = vtkSmartPointer<vtkGraphToPolyData>::New();
   graphToPolyDataFilter->SetInput(riemannianGraph);
   graphToPolyDataFilter->Update();
   
-  //write the result to a file
+  // Write the result to a file
   vtkSmartPointer<vtkXMLPolyDataWriter> polyDataWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   polyDataWriter->SetInput(graphToPolyDataFilter->GetOutput());
   polyDataWriter->SetFileName(outputPolyDataFilename.c_str());
   polyDataWriter->Write();
   
-  return 0;
+  return EXIT_SUCCESS;
 }

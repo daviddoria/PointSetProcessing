@@ -1,45 +1,41 @@
 cmake_minimum_required(VERSION 2.6)
 
 PROJECT(PointSetProcessing)
-ENABLE_TESTING()
+
+SET(BuildPlugins OFF CACHE BOOL "Build plugins?")
+if(BuildPlugins)
+  FIND_PACKAGE(ParaView REQUIRED)
+  INCLUDE(${PARAVIEW_USE_FILE})
+  add_subdirectory(ParaViewPlugins)
+else()
+  FIND_PACKAGE(VTK REQUIRED)
+  INCLUDE(${VTK_USE_FILE})
+endif()
+
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
-
-FIND_PACKAGE(VTK REQUIRED)
-INCLUDE(${VTK_USE_FILE})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 if(NOT VTK_USE_BOOST)
-  MESSAGE(SEND_ERROR "VTK must be buile with VTK_USE_BOOST=ON.")
+  MESSAGE(SEND_ERROR "VTK must be built with VTK_USE_BOOST=ON.")
 endif ()
 
 SET(PointSetProcessingDir ${CMAKE_CURRENT_SOURCE_DIR})
 SET(DataDir ./)
 
-############ VTK Filters ####################
-ADD_EXECUTABLE(vtkPointSetOutlierRemovalExample ${PointSetProcessingDir}/vtkPointSetOutlierRemovalExample.cxx
-${PointSetProcessingDir}/vtkPointSetOutlierRemoval.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetOutlierRemovalExample ${VTK_LIBRARIES} )
-
-ADD_EXECUTABLE(vtkPointSetCurvatureEstimationExample ${PointSetProcessingDir}/vtkPointSetCurvatureEstimationExample.cxx
-${PointSetProcessingDir}/vtkPointSetCurvatureEstimation.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetCurvatureEstimationExample ${VTK_LIBRARIES} )
-
-ADD_EXECUTABLE(vtkPointSetNormalEstimationExample ${PointSetProcessingDir}/vtkPointSetNormalEstimationExample.cxx
-${PointSetProcessingDir}/vtkPointSetNormalEstimation.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetNormalEstimationExample ${VTK_LIBRARIES} )
-
-ADD_EXECUTABLE(vtkPointSetNormalOrientationExample ${PointSetProcessingDir}/vtkPointSetNormalOrientationExample.cxx
-${PointSetProcessingDir}/vtkPointSetNormalOrientation.cxx 
-${PointSetProcessingDir}/vtkRiemannianGraphFilter.cxx 
-${PointSetProcessingDir}/vtkEuclideanMinimumSpanningTree.cxx)
-TARGET_LINK_LIBRARIES(vtkPointSetNormalOrientationExample ${VTK_LIBRARIES})
 
 SET(BuildTesting OFF CACHE BOOL "Build testing?")
 if(BuildTesting)
   add_subdirectory(Tests)
 endif()
 
-SET(BuildPlugins OFF CACHE BOOL "Build plugins?")
-if(BuildPlugins)
-  add_subdirectory(ParaViewPlugins)
+
+SET(BuildGUI OFF CACHE BOOL "Build GUI?")
+if(BuildGUI)
+  add_subdirectory(GUI)
+endif()
+
+SET(BuildExamples OFF CACHE BOOL "Build examples?")
+if(BuildExamples)
+  add_subdirectory(Examples)
 endif()

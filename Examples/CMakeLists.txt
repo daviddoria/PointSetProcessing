@@ -1,0 +1,20 @@
+ADD_EXECUTABLE(PointSetOutlierRemovalExample PointSetOutlierRemoval.cpp
+${PointSetProcessingDir}/vtkPointSetOutlierRemoval.cxx)
+TARGET_LINK_LIBRARIES(PointSetOutlierRemovalExample ${VTK_LIBRARIES} )
+
+ADD_EXECUTABLE(PointSetCurvatureEstimationExample PointSetCurvatureEstimation.cpp
+${PointSetProcessingDir}/vtkPointSetCurvatureEstimation.cxx)
+TARGET_LINK_LIBRARIES(PointSetCurvatureEstimationExample ${VTK_LIBRARIES} )
+
+ADD_EXECUTABLE(PointSetNormalEstimationExample PointSetNormalEstimation.cpp
+${PointSetProcessingDir}/vtkPointSetNormalEstimation.cxx)
+TARGET_LINK_LIBRARIES(PointSetNormalEstimationExample ${VTK_LIBRARIES} )
+
+ADD_EXECUTABLE(PointSetNormalOrientationExample PointSetNormalOrientation.cpp
+${PointSetProcessingDir}/vtkPointSetNormalOrientation.cxx 
+${PointSetProcessingDir}/vtkRiemannianGraphFilter.cxx 
+${PointSetProcessingDir}/vtkEuclideanMinimumSpanningTree.cxx)
+TARGET_LINK_LIBRARIES(PointSetNormalOrientationExample ${VTK_LIBRARIES})
+
+ADD_EXECUTABLE(GenerateData GenerateData.cpp)
+TARGET_LINK_LIBRARIES(GenerateData ${VTK_LIBRARIES})

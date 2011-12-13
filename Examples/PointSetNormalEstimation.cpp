@@ -8,28 +8,28 @@
 
 int main (int argc, char *argv[])
 {
-  //verify command line arguments
+  // Verify command line arguments
   if(argc != 3)
     {
-    vtkstd::cout << "Required arguments: InputFilename OutputFilename" << vtkstd::endl;
-    exit(-1);
+    std::cout << "Required arguments: InputFilename OutputFilename" << std::endl;
+    return EXIT_FAILURE;
     }
   
-  //parse command line arguments
-  vtkstd::string InputFilename = argv[1];
-  vtkstd::string OutputFilename = argv[2];
+  // Parse command line arguments
+  std::string InputFilename = argv[1];
+  std::string OutputFilename = argv[2];
   
-  //read the input file
+  // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> Reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   Reader->SetFileName(InputFilename.c_str());
   Reader->Update();
   
-  //estimate normals
+  // Estimate normals
   vtkSmartPointer<vtkPointSetNormalEstimation> NormalEstimation = vtkSmartPointer<vtkPointSetNormalEstimation>::New();
   NormalEstimation->SetInput(Reader->GetOutput());
   NormalEstimation->Update();
   
-  //write the output file with the estimated normals
+  // Write the output file with the estimated normals
   vtkSmartPointer<vtkXMLPolyDataWriter> Writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   Writer->SetFileName(OutputFilename.c_str());
   Writer->SetInput(NormalEstimation->GetOutput());
