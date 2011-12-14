@@ -4,14 +4,16 @@
 #include <QFileDialog>
 
 // VTK
-#include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkXMLPolyDataReader.h>
-#include <vtkXMLPolyDataWriter.h>
 #include <vtkArrowSource.h>
 #include <vtkGlyph3D.h>
+#include <vtkPolyData.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkProperty.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkSphereSource.h>
+#include <vtkXMLPolyDataReader.h>
+#include <vtkXMLPolyDataWriter.h>
 
 // Custom
 #include "vtkPointSetNormalEstimation.h"
@@ -31,15 +33,28 @@ void PointSetProcessingWidget::SharedConstructor()
 {
   this->setupUi(this);
 
-  this->NormalEstimationThread = new VTKComputationThread<vtkPointSetNormalEstimation>;
-  this->NormalEstimationFilter = vtkSmartPointer<vtkPointSetNormalEstimation>::New();
-  
+  this->SphereSource = vtkSmartPointer<vtkSphereSource>::New();
+  this->SphereSource->SetRadius(this->sldNeighborRadius->GetValue());
+  this->SphereMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  this->SphereMapper->SetInputConnection(this->SphereSource->GetOutputPort());
+  this->SphereActor = vtkSmartPointer<vtkActor>::New();
+  this->SphereActor->SetMapper(this->SphereMapper);
+  this->SphereActor->GetProperty()->SetOpacity(.2);
+
   this->PointsPolyData = vtkSmartPointer<vtkPolyData>::New();
   this->PointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   this->PointsMapper->SetInputConnection(this->PointsPolyData->GetProducerPort());
   this->PointsActor = vtkSmartPointer<vtkActor>::New();
   this->PointsActor->SetMapper(this->PointsMapper);
   
+  this->NormalEstimationFilter = vtkSmartPointer<vtkPointSetNormalEstimation>::New();
+  this->NormalEstimationFilter->SetModeToRadius();
+  this->NormalEstimationFilter->SetRadius(this->sldNeighborRadius->GetValue());
+  this->NormalEstimationFilter->SetInputConnection(this->PointsPolyData->GetProducerPort());
+  
+  this->NormalEstimationThread = new VTKComputationThread<vtkPointSetNormalEstimation>;
+  this->NormalEstimationThread->SetFilter(this->NormalEstimationFilter);
+
   // Normals
   this->NormalsPolyData = vtkSmartPointer<vtkPolyData>::New();
   
@@ -50,7 +65,7 @@ void PointSetProcessingWidget::SharedConstructor()
   this->ArrowGlyphFilter->SetSource(this->ArrowSource->GetOutput());
   this->ArrowGlyphFilter->OrientOn();
   this->ArrowGlyphFilter->SetScaleModeToScaleByScalar();
-  this->ArrowGlyphFilter->SetScaleFactor(.1f);
+  this->ArrowGlyphFilter->SetScaleFactor(this->sldArrowSize->GetValue());
   this->ArrowGlyphFilter->SetVectorModeToUseNormal();
   this->ArrowGlyphFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
   this->ArrowGlyphFilter->Update();
@@ -64,6 +79,7 @@ void PointSetProcessingWidget::SharedConstructor()
   this->Renderer = vtkSmartPointer<vtkRenderer>::New();
   this->Renderer->AddViewProp(this->PointsActor);
   this->Renderer->AddViewProp(this->NormalsActor);
+  this->Renderer->AddViewProp(this->SphereActor);
 
   // Connect VTK with Qt
   this->qvtkWidget->GetRenderWindow()->AddRenderer(this->Renderer);
@@ -81,8 +97,6 @@ void PointSetProcessingWidget::SharedConstructor()
 void PointSetProcessingWidget::on_btnGenerateNormals_clicked()
 {
   // Estimate normals
-  this->NormalEstimationFilter->SetInputConnection(this->PointsPolyData->GetProducerPort());
-  this->NormalEstimationThread->SetFilter(this->NormalEstimationFilter);
   this->NormalEstimationThread->start();
 }
 
@@ -112,6 +126,10 @@ void PointSetProcessingWidget::OpenFile(const std::string& fileName)
   this->PointsPolyData->DeepCopy(reader->GetOutput());
   this->PointsPolyData->Modified();
   this->Renderer->ResetCamera();
+  
+  double p0[3];
+  this->PointsPolyData->GetPoint(0,p0);
+  this->SphereActor->SetPosition(p0);
 }
 
 void PointSetProcessingWidget::on_actionSave_activated()
@@ -143,8 +161,25 @@ void PointSetProcessingWidget::slot_StopProgressBar()
 
 void PointSetProcessingWidget::slot_NormalEstimationComplete()
 {
-  std::cout << "slot_NormalEstimationComplete()" << std::endl;
+  // std::cout << "slot_NormalEstimationComplete()" << std::endl;
   this->NormalsPolyData->DeepCopy(this->NormalEstimationFilter->GetOutput());
   this->NormalsPolyData->Modified();
+  this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+void PointSetProcessingWidget::on_sldNeighborRadius_valueChanged(float value)
+{
+  // std::cout << "on_sldNeighborRadius_valueChanged to " << value << " (" << this->sldNeighborRadius->GetValue() << ")" << std::endl;
+  this->NormalEstimationFilter->SetRadius(value);
+  this->SphereSource->SetRadius(value);
+  this->SphereSource->Update();
+  this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+void PointSetProcessingWidget::on_sldArrowSize_valueChanged(float value)
+{
+  // std::cout << "on_sldArrowSize_valueChanged to " << value << std::endl;
+  this->ArrowGlyphFilter->SetScaleFactor(value);
+  this->ArrowGlyphFilter->Update();
   this->qvtkWidget->GetRenderWindow()->Render();
 }

@@ -8,13 +8,14 @@
 
 // VTK
 #include <vtkSmartPointer.h>
+class vtkActor;
+class vtkArrowSource;
+class vtkGlyph3D;
 class vtkPolyData;
 class vtkPolyDataMapper;
-class vtkActor;
-class vtkGlyph3D;
-class vtkArrowSource;
+class vtkSphereSource;
 
-//class VTKComputationThread;
+// Custom
 #include "VTKComputationThread.h"
 class vtkPointSetNormalEstimation;
 
@@ -26,22 +27,25 @@ public:
   PointSetProcessingWidget(QMainWindow *parent = 0);
   PointSetProcessingWidget(const std::string& fileName); 
   void SharedConstructor();
-  
+
   void OpenFile(const std::string& fileName);
-  
+
 public slots:
-  
+
   void on_btnGenerateNormals_clicked();
   void on_btnOrientNormals_clicked();
-  
+
   void on_actionOpenFile_activated();
   void on_actionSave_activated();
-  
+
   void slot_StartProgressBar();
   void slot_StopProgressBar();
-  
+
   void slot_NormalEstimationComplete();
-  
+
+  void on_sldNeighborRadius_valueChanged(float);
+  void on_sldArrowSize_valueChanged(float);
+
 private:
   vtkSmartPointer<vtkPolyData> PointsPolyData;
   vtkSmartPointer<vtkPolyDataMapper> PointsMapper;
@@ -55,6 +59,11 @@ private:
   
   vtkSmartPointer<vtkRenderer> Renderer;
   
+  // This sphere indicates the radius used for the neighbor search
+  vtkSmartPointer<vtkSphereSource> SphereSource;
+  vtkSmartPointer<vtkPolyDataMapper> SphereMapper;
+  vtkSmartPointer<vtkActor> SphereActor;
+    
   vtkSmartPointer<vtkPointSetNormalEstimation> NormalEstimationFilter;
   VTKComputationThread<vtkPointSetNormalEstimation>* NormalEstimationThread;
 };

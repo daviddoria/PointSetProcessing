@@ -1,16 +1,16 @@
-#include <vtkSmartPointer.h>
-#include <vtkObjectFactory.h>
-#include <vtkIdList.h>
-#include <vtkPoints.h>
 #include <vtkCellArray.h>
-#include <vtkDoubleArray.h>
-#include <vtkPointData.h>
+#include <vtkFloatArray.h>
+#include <vtkIdList.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
-#include <vtkPlane.h>
-#include <vtkPolyData.h>
 #include <vtkKdTree.h>
 #include <vtkMath.h>
+#include <vtkObjectFactory.h>
+#include <vtkPlane.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
 
 #include "vtkPointSetNormalEstimation.h"
 
@@ -18,7 +18,19 @@ vtkStandardNewMacro(vtkPointSetNormalEstimation);
 
 vtkPointSetNormalEstimation::vtkPointSetNormalEstimation()
 {
-  kNeighbors = 4;
+  this->NumberOfNeighbors = 4;
+  this->Radius = 1.0;
+  this->Mode = RADIUS;
+}
+
+void vtkPointSetNormalEstimation::SetModeToFixedNumber()
+{
+  this->Mode = FIXED_NUMBER;
+}
+
+void vtkPointSetNormalEstimation::SetModeToRadius()
+{
+  this->Mode = RADIUS;
 }
 
 int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request),
@@ -34,8 +46,7 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
   vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // Create normal array
-  vtkSmartPointer<vtkDoubleArray> normalArray = 
-    vtkSmartPointer<vtkDoubleArray>::New();
+  vtkSmartPointer<vtkFloatArray> normalArray = vtkSmartPointer<vtkFloatArray>::New();
   normalArray->SetNumberOfComponents( 3 );
   normalArray->SetNumberOfTuples( input->GetNumberOfPoints() );
   normalArray->SetName( "Normals" );
@@ -43,16 +54,27 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
   vtkSmartPointer<vtkKdTree> kDTree = vtkSmartPointer<vtkKdTree>::New();
   kDTree->BuildLocatorFromPoints(input->GetPoints());
 
-  // Add a random vector (clearly to be replaced with your actual normals) to each point in the polydata
-  for(unsigned int i = 0; i < input->GetNumberOfPoints(); i++)
+  // std::cout << "this->Radius: " << this->Radius << std::endl;
+
+  // Estimate the normal at each point.
+  for(vtkIdType pointId = 0; pointId < input->GetNumberOfPoints(); ++pointId)
     {
-    
+
     double point[3];
-    input->GetPoint(i, point);
+    input->GetPoint(pointId, point);
 
     vtkSmartPointer<vtkIdList> neighborIds = vtkSmartPointer<vtkIdList>::New();
-    kDTree->FindClosestNPoints(this->kNeighbors, point, neighborIds);
-    
+    if(this->Mode == FIXED_NUMBER)
+      {
+      kDTree->FindClosestNPoints(this->NumberOfNeighbors, point, neighborIds);
+      }
+    else if(this->Mode == RADIUS)
+      {
+      kDTree->FindPointsWithinRadius(this->Radius, point, neighborIds);
+      }
+
+    // std::cout << neighborIds->GetNumberOfIds() << " neighbors." << std::endl;
+
     vtkSmartPointer<vtkPoints> neighbors = vtkSmartPointer<vtkPoints>::New();
     for(unsigned int p = 0; p < neighborIds->GetNumberOfIds(); p++)
       {
@@ -60,18 +82,18 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
       input->GetPoint(neighborIds->GetId(p), neighbor);
       neighbors->InsertNextPoint(neighbor);
       }
-    
+
     vtkSmartPointer<vtkPlane> bestPlane = vtkSmartPointer<vtkPlane>::New();
     BestFitPlane(neighbors, bestPlane);
     double normal[3];
     bestPlane->GetNormal(normal);
-    normalArray->SetTuple( i, normal ) ;
+    normalArray->SetTuple( pointId, normal ) ;
     }
- 
+
   input->GetPointData()->SetNormals(normalArray);
 
   output->ShallowCopy(input);
-  
+
   return 1;
 }
 
@@ -80,7 +102,9 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
 void vtkPointSetNormalEstimation::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "kNeighbors: " << this->kNeighbors << endl;
+  os << indent << "NumberOfNeighbors: " << this->NumberOfNeighbors << endl;
+  os << indent << "Radius: " << this->Radius << endl;
+  os << indent << "Mode: " << this->Mode << endl;
 }
 
 void CenterOfMass(vtkPoints* points, double* center)

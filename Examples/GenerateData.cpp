@@ -8,6 +8,7 @@
 int main (int argc, char *argv[])
 {
   vtkSmartPointer<vtkSphereSource> sphereSource = vtkSmartPointer<vtkSphereSource>::New();
+  sphereSource->SetRadius(1.0);
   sphereSource->SetPhiResolution(20);
   sphereSource->SetThetaResolution(20);
   sphereSource->Update();

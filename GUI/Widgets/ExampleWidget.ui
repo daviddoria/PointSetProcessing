@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ExampleWidget</class>
+ <widget class="QMainWindow" name="ExampleWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="LabeledSlider" name="labeledSliderPlugin">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>40</y>
+      <width>331</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Labeled slider</string>
+    </property>
+    <property name="whatsThis">
+     <string>The LabeledSlider widget takes the responsibility of diplaying the current value in the label.</string>
+    </property>
+    <property name="name">
+     <string>Labeled</string>
+    </property>
+    <property name="maxValueText">
+     <number>40</number>
+    </property>
+   </widget>
+   <widget class="FloatSlider" name="floatSlider">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>230</y>
+      <width>291</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="toolTip">
+     <string>Float slider</string>
+    </property>
+    <property name="whatsThis">
+     <string>The float slider widget allows the user to select a float value.</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>28</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FloatSlider</class>
+   <extends>LabeledSlider</extends>
+   <header>FloatSlider.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LabeledSlider</class>
+   <extends>QWidget</extends>
+   <header>LabeledSlider.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -11,12 +11,44 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Point Set Processing</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,5">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="FloatSlider" name="sldArrowSize">
+        <property name="toolTip">
+         <string>Float slider</string>
+        </property>
+        <property name="whatsThis">
+         <string>The float slider widget allows the user to select a float value.</string>
+        </property>
+        <property name="name">
+         <string>Arrow size</string>
+        </property>
+        <property name="maxValueText">
+         <double>10.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="FloatSlider" name="sldNeighborRadius">
+        <property name="toolTip">
+         <string>Float slider</string>
+        </property>
+        <property name="whatsThis">
+         <string>The float slider widget allows the user to select a float value.</string>
+        </property>
+        <property name="name">
+         <string>Neighbor radius</string>
+        </property>
+        <property name="maxValueText">
+         <double>10.000000000000000</double>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QPushButton" name="btnGenerateNormals">
         <property name="text">
@@ -80,6 +112,16 @@
   </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>FloatSlider</class>
+   <extends>LabeledSlider</extends>
+   <header>FloatSlider.h</header>
+  </customwidget>
+  <customwidget>
+   <class>LabeledSlider</class>
+   <extends>QWidget</extends>
+   <header>LabeledSlider.h</header>
+  </customwidget>
   <customwidget>
    <class>QVTKWidget</class>
    <extends>QWidget</extends>
