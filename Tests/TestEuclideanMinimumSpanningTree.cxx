@@ -9,7 +9,7 @@
 #include "vtkEuclideanMinimumSpanningTree.h"
 
 template<class A>
-bool fuzzyCompare(A a, A b) 
+bool fuzzyCompare(A a, A b)
 {
   return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
@@ -22,23 +22,23 @@ int main (int argc, char *argv[])
     std::cout << "Required arguments: InputFilename GroundTruthFilename" << std::endl;
     return EXIT_FAILURE;
     }
-  
+
   // Parse command line arguments
   std::string inputFileName = argv[1];
   std::string groundTruthFileName = argv[2];
-  
+
   // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> inputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   inputReader->SetFileName(inputFileName.c_str());
   inputReader->Update();
-  
+
   vtkPolyData* inputPolyData = inputReader->GetOutput();
-  
+
   // Estimate normals
   vtkSmartPointer<vtkEuclideanMinimumSpanningTree> emstFilter = vtkSmartPointer<vtkEuclideanMinimumSpanningTree>::New();
   emstFilter->SetInput(inputReader->GetOutput());
   emstFilter->Update();
-  
+
   vtkGraph* emst = emstFilter->GetOutput();
 
   // Read the ground truth file
@@ -47,7 +47,7 @@ int main (int argc, char *argv[])
   groundTruthReader->Update();
 
   vtkGraph* groundTruth = groundTruthReader->GetOutput();
-  
+
   if(groundTruth->GetNumberOfVertices() != emst->GetNumberOfVertices())
     {
     std::cout << "GroundTruth->GetNumberOfVertices() != NearestNeighborGraph->GetNumberOfVertices()" << std::endl;

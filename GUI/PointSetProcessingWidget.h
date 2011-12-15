@@ -26,7 +26,7 @@ Q_OBJECT
 public:
 
   PointSetProcessingWidget(QMainWindow *parent = 0);
-  PointSetProcessingWidget(const std::string& fileName); 
+  PointSetProcessingWidget(const std::string& fileName);
   void SharedConstructor();
 
   void OpenFile(const std::string& fileName);
@@ -34,7 +34,7 @@ public:
 public slots:
 
   void on_btnOrientNormalsToPoint_clicked();
-  
+
   void on_btnGenerateNormals_clicked();
   void on_btnOrientNormals_clicked();
 
@@ -56,7 +56,7 @@ private:
   vtkSmartPointer<vtkPolyData> PointsPolyData;
   vtkSmartPointer<vtkPolyDataMapper> PointsMapper;
   vtkSmartPointer<vtkActor> PointsActor;
-  
+
   vtkSmartPointer<vtkPolyData> NormalsPolyData;
   vtkSmartPointer<vtkPolyDataMapper> NormalsMapper;
   vtkSmartPointer<vtkActor> NormalsActor;

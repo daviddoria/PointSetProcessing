@@ -52,7 +52,7 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
   normalArray->SetNumberOfComponents( 3 );
   normalArray->SetNumberOfTuples( input->GetNumberOfPoints() );
   normalArray->SetName( "Normals" );
-  
+
   vtkSmartPointer<vtkKdTree> kDTree = vtkSmartPointer<vtkKdTree>::New();
   kDTree->BuildLocatorFromPoints(input->GetPoints());
 
@@ -180,25 +180,25 @@ void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane)
   // Compute the best fit (least squares) plane through a set of points.
   vtkIdType numPoints = points->GetNumberOfPoints();
   double dNumPoints = static_cast<double>(numPoints);
-  
+
   // Find the center of mass of the points
   double center[3];
   CenterOfMass(points, center);
   // std::cout << "Center of mass: " << Center[0] << " " << Center[1] << " " << Center[2] << vtkstd::endl;
-  
+
   //Compute sample covariance matrix
   double **a = create_matrix<double> ( 3,3 );
   a[0][0] = 0; a[0][1] = 0;  a[0][2] = 0;
   a[1][0] = 0; a[1][1] = 0;  a[1][2] = 0;
   a[2][0] = 0; a[2][1] = 0;  a[2][2] = 0;
-  
+
   for(vtkIdType pointId = 0; pointId < numPoints; pointId++ )
     {
     double x[3];
     double xp[3];
     points->GetPoint(pointId, x);
-    xp[0] = x[0] - center[0]; 
-    xp[1] = x[1] - center[1]; 
+    xp[0] = x[0] - center[0];
+    xp[1] = x[1] - center[1];
     xp[2] = x[2] - center[2];
     for (unsigned int i = 0; i < 3; i++)
       {
@@ -207,7 +207,7 @@ void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane)
       a[2][i] += xp[2] * xp[i];
       }
     }
-  
+
   // Divide by N-1
   for(unsigned int i = 0; i < 3; i++)
     {
@@ -218,19 +218,19 @@ void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane)
 
   // Extract eigenvectors from covariance matrix
   double **eigvec = create_matrix<double> ( 3,3 );
-  
+
   double eigval[3];
   vtkMath::Jacobi(a,eigval,eigvec);
 
   //Jacobi iteration for the solution of eigenvectors/eigenvalues of a 3x3 real symmetric matrix. Square 3x3 matrix a; output eigenvalues in w; and output eigenvectors in v. Resulting eigenvalues/vectors are sorted in decreasing order; eigenvectors are normalized.
-  
+
   // Set the plane normal to the smallest eigen vector
   bestPlane->SetNormal(eigvec[0][2], eigvec[1][2], eigvec[2][2]);
-  
+
   // Cleanup
   free_matrix(eigvec);
   free_matrix(a);
-  
+
   // Set the plane origin to the center of mass
   bestPlane->SetOrigin(center[0], center[1], center[2]);
 

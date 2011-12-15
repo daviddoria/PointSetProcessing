@@ -18,7 +18,7 @@ FloatSlider::FloatSlider(QWidget *parent) : LabeledSlider(parent)
 
 //   this->MinValue = 0.0f;
 //   this->txtMin->setText(QString::number(this->MinValue));
-//   
+//
 //   this->MaxValue = 10.0f;
 //   this->txtMax->setText(QString::number(this->MaxValue));
 
@@ -28,7 +28,7 @@ FloatSlider::FloatSlider(QWidget *parent) : LabeledSlider(parent)
   this->txtMin->setValidator(this->Validator);
   this->txtMax->setValidator(this->Validator);
 }
-  
+
 float FloatSlider::GetValue()
 {
   return this->txtMin->text().toFloat() + (this->txtMax->text().toFloat() - this->txtMin->text().toFloat()) * static_cast<float>(this->horizontalSlider->value()) / 100.0f;

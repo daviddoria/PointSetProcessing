@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
     {
     pointSetProcessingWidget = new PointSetProcessingWidget(argv[1]);
     }
-  
+
   pointSetProcessingWidget->show();
 
   return app.exec();

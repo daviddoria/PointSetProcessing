@@ -11,7 +11,7 @@
 #include "vtkPointSetNormalEstimation.h"
 
 template<class A>
-bool fuzzyCompare(A a, A b) 
+bool fuzzyCompare(A a, A b)
 {
   return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
@@ -25,24 +25,24 @@ int main (int argc, char *argv[])
     cout << "Required arguments: InputFilename GroundTruthFilename" << endl;
     return EXIT_FAILURE;
     }
-  
+
   // Parse command line arguments
   std::string inputFilename = argv[1];
   std::string groundTruthFilename = argv[2];
-  
+
   // Read the input file
-  vtkSmartPointer<vtkXMLPolyDataReader> inputReader = 
+  vtkSmartPointer<vtkXMLPolyDataReader> inputReader =
     vtkSmartPointer<vtkXMLPolyDataReader>::New();
   inputReader->SetFileName(inputFilename.c_str());
   inputReader->Update();
-  
+
   // Estimate normals
-  vtkSmartPointer<vtkPointSetNormalEstimation> normalEstimation = 
+  vtkSmartPointer<vtkPointSetNormalEstimation> normalEstimation =
       vtkSmartPointer<vtkPointSetNormalEstimation>::New();
   normalEstimation->SetInput(inputReader->GetOutput());
   normalEstimation->SetNumberOfNeighbors(5);
   normalEstimation->Update();
-  
+
   vtkPolyData* estimatedNormalsPolyData = normalEstimation->GetOutput();
 
   /*
@@ -51,15 +51,15 @@ int main (int argc, char *argv[])
   writer->SetFileName("output.vtp");
   writer->Write();
   */
-  
+
   // Read the ground truth file
-  vtkSmartPointer<vtkXMLPolyDataReader> groundTruthReader = 
+  vtkSmartPointer<vtkXMLPolyDataReader> groundTruthReader =
     vtkSmartPointer<vtkXMLPolyDataReader>::New();
   groundTruthReader->SetFileName(groundTruthFilename.c_str());
   groundTruthReader->Update();
 
   vtkPolyData* groundTruthPolyData = groundTruthReader->GetOutput();
-  
+
   // Check that the number of points match
   if(groundTruthPolyData->GetNumberOfPoints() != estimatedNormalsPolyData->GetNumberOfPoints())
     {
@@ -70,7 +70,7 @@ int main (int argc, char *argv[])
     }
 
   // Get both sets of normals
-  vtkSmartPointer<vtkDoubleArray> groundTruthNormals = 
+  vtkSmartPointer<vtkDoubleArray> groundTruthNormals =
     vtkDoubleArray::SafeDownCast(groundTruthPolyData->GetPointData()->GetNormals());
   vtkSmartPointer<vtkDoubleArray> estimatedNormals =
     vtkDoubleArray::SafeDownCast(estimatedNormalsPolyData->GetPointData()->GetNormals());
@@ -81,7 +81,7 @@ int main (int argc, char *argv[])
     double est[3];
     estimatedNormals->GetTuple(i, est);
     groundTruthNormals->GetTuple(i, gt);
-    
+
     for(unsigned int p = 0; p < 3; p++)
       {
       if(!fuzzyCompare(gt[p], est[p]))

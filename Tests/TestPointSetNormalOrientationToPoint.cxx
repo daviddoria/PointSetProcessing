@@ -46,7 +46,7 @@ int main (int argc, char *argv[])
   polyData->GetPointData()->SetNormals(normals);
 
   WritePolyData(polyData, "input.vtp");
-  
+
   // Orient the normals toward +z
   vtkSmartPointer<vtkPointSetNormalOrientationToPoint> orientationToPointFilter =
     vtkSmartPointer<vtkPointSetNormalOrientationToPoint>::New();
@@ -56,9 +56,9 @@ int main (int argc, char *argv[])
   orientationToPointFilter->Update();
 
   WritePolyData(orientationToPointFilter->GetOutput(), "output.vtp");
-  
+
   vtkFloatArray* newNormals = vtkFloatArray::SafeDownCast(orientationToPointFilter->GetOutput()->GetPointData()->GetNormals());
-  
+
   // Check the angle between each output normal and the vector to the orientation point
   for(vtkIdType pointId = 0; pointId < polyData->GetNumberOfPoints(); ++pointId)
     {

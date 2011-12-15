@@ -34,7 +34,7 @@ public slots:
   void slot_horizontalSlider_valueChanged(int value);
   virtual void on_txtMin_textChanged( const QString & text );
   virtual void on_txtMax_textChanged( const QString & text );
-  
+
 protected:
   void SetCurrentValueLabel();
 

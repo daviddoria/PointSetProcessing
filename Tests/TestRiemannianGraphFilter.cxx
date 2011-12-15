@@ -9,7 +9,7 @@
 #include "vtkRiemannianGraphFilter.h"
 
 template<class A>
-bool fuzzyCompare(A a, A b) 
+bool fuzzyCompare(A a, A b)
 {
   return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
@@ -22,24 +22,24 @@ int main (int argc, char *argv[])
     std::cout << "Required arguments: InputFilename GroundTruthFilename" << std::endl;
     return EXIT_FAILURE;
     }
-  
+
   // Parse command line arguments
   std::string InputFilename = argv[1];
   std::string GroundTruthFilename = argv[2];
-  
+
   // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> InputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   InputReader->SetFileName(InputFilename.c_str());
   InputReader->Update();
-  
+
   vtkPolyData* InputPolyData = InputReader->GetOutput();
-  
+
   // Estimate normals
   vtkSmartPointer<vtkRiemannianGraphFilter> RiemannianGraphFilter = vtkSmartPointer<vtkRiemannianGraphFilter>::New();
   RiemannianGraphFilter->SetkNeighbors(3);
   RiemannianGraphFilter->SetInput(InputReader->GetOutput());
   RiemannianGraphFilter->Update();
-  
+
   vtkGraph* RiemannianGraph = RiemannianGraphFilter->GetOutput();
 
   // Read the ground truth file
@@ -48,7 +48,7 @@ int main (int argc, char *argv[])
   GroundTruthReader->Update();
 
   vtkGraph* GroundTruth = GroundTruthReader->GetOutput();
-  
+
   if(GroundTruth->GetNumberOfVertices() != RiemannianGraph->GetNumberOfVertices())
     {
     std::cout << "GroundTruth->GetNumberOfVertices() != RiemannianGraph->GetNumberOfVertices()" << std::endl;

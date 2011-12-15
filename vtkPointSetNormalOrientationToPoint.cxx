@@ -35,7 +35,7 @@ int vtkPointSetNormalOrientationToPoint::RequestData(vtkInformation *vtkNotUsed(
   vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   std::cout << "Orienting to point " << this->OrientationPoint[0] << " " << this->OrientationPoint[1] << " " << this->OrientationPoint[2] << std::endl;
-  
+
   vtkFloatArray* oldNormals = vtkFloatArray::SafeDownCast(input->GetPointData()->GetNormals());
 
   vtkSmartPointer<vtkFloatArray> orientedNormals = vtkSmartPointer<vtkFloatArray>::New();
@@ -79,5 +79,5 @@ void vtkPointSetNormalOrientationToPoint::PrintSelf(ostream &os, vtkIndent inden
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Orientation point: (" << this->OrientationPoint[0] << ", "
                << this->OrientationPoint[1] << ", " << this->OrientationPoint[2] << ")" << std::endl;
-  
+
 }

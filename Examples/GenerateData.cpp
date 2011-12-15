@@ -12,22 +12,22 @@ int main (int argc, char *argv[])
   sphereSource->SetPhiResolution(20);
   sphereSource->SetThetaResolution(20);
   sphereSource->Update();
-  
+
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->DeepCopy(sphereSource->GetOutput()->GetPoints());
-  
+
   vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   polyData->SetPoints(points);
-  
+
   vtkSmartPointer<vtkVertexGlyphFilter> glyphFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
   glyphFilter->SetInputConnection(polyData->GetProducerPort());
   glyphFilter->Update();
-  
+
   // Write the result to a file
   vtkSmartPointer<vtkXMLPolyDataWriter> polyDataWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   polyDataWriter->SetInput(glyphFilter->GetOutput());
   polyDataWriter->SetFileName("SpherePoints.vtp");
   polyDataWriter->Write();
-  
+
   return EXIT_SUCCESS;
 }

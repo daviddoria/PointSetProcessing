@@ -17,17 +17,17 @@ class vtkRiemannianGraphFilter : public vtkGraphAlgorithm
     static vtkRiemannianGraphFilter *New();
     vtkTypeMacro(vtkRiemannianGraphFilter, vtkGraphAlgorithm);
     void PrintSelf(ostream &os, vtkIndent indent);
-    
+
     vtkSetMacro(kNeighbors, unsigned int);
     vtkGetMacro(kNeighbors, unsigned int);
-    
+
   protected:
     vtkRiemannianGraphFilter();
     ~vtkRiemannianGraphFilter(){}
     int FillInputPortInformation( int port, vtkInformation* info );
     int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *); //the function that makes this class work with the vtk pipeline
     int RequestDataObject(vtkInformation *, vtkInformationVector **, vtkInformationVector *); //the function that makes this class work with the vtk pipeline
-    
+
   private:
     unsigned int kNeighbors;
 };

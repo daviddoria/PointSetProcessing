@@ -5,7 +5,7 @@
 LabeledSlider::LabeledSlider(QWidget *parent) : QWidget(parent)
 {
   setupUi(this);
-  
+
   //this->txtMin->setText(QString::number(this->horizontalSlider->minimum()));
   //this->txtMax->setText(QString::number(this->horizontalSlider->maximum()));
 
@@ -18,7 +18,7 @@ LabeledSlider::LabeledSlider(QWidget *parent) : QWidget(parent)
 
   // Position the slider in the center of the range
   this->horizontalSlider->setValue((this->txtMax->text().toInt() - this->txtMin->text().toInt())/2);
-  
+
   // Set the value label
   this->lblCurrent->setText(QString::number(this->horizontalSlider->value()));
 

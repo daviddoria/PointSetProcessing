@@ -21,13 +21,13 @@ int main (int argc, char *argv[])
         }
       }
     }
-  
+
   // Add some outlier points
   double val = .4;
   points->InsertNextPoint(val, val, val);
   points->InsertNextPoint(-val, val, val);
   points->InsertNextPoint(val, -val, val);
-  
+
   // Create cells
   vtkSmartPointer<vtkCellArray> vertices = vtkSmartPointer<vtkCellArray>::New();
   for(vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
@@ -36,7 +36,7 @@ int main (int argc, char *argv[])
     id[0] = i;
     vertices->InsertNextCell ( 1, id );
     }
-  
+
   vtkSmartPointer<vtkPolyData> polydata = vtkSmartPointer<vtkPolyData>::New();
   polydata->SetPoints(points);
   polydata->SetVerts(vertices);
@@ -45,6 +45,6 @@ int main (int argc, char *argv[])
   writer->SetFileName("Input.vtp");
   writer->SetInput(polydata);
   writer->Write();
-  
+
   return EXIT_SUCCESS;
 }

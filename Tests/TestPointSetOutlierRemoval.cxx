@@ -9,7 +9,7 @@
 #include "vtkPointSetOutlierRemoval.h"
 
 template<class A>
-bool fuzzyCompare(A a, A b) 
+bool fuzzyCompare(A a, A b)
 {
   return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
@@ -22,22 +22,22 @@ int main (int argc, char *argv[])
     std::cout << "Required arguments: InputFilename GroundTruthFilename" << vtkstd::endl;
     return EXIT_FAILURE;
     }
-  
+
   // Parse command line arguments
   std::string inputFileName = argv[1];
   std::string groundTruthFileName = argv[2];
-  
+
   // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> inputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   inputReader->SetFileName(inputFileName.c_str());
   inputReader->Update();
-  
+
   // Estimate normals
   vtkSmartPointer<vtkPointSetOutlierRemoval> outlierRemoval = vtkSmartPointer<vtkPointSetOutlierRemoval>::New();
   outlierRemoval->SetInput(inputReader->GetOutput());
   outlierRemoval->SetPercentToRemove(.01); //remove 1% of the points
   outlierRemoval->Update();
-  
+
   vtkPolyData* outliersRemoved = outlierRemoval->GetOutput();
 
   // Read the ground truth file
@@ -68,7 +68,7 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
         }
       }
-    }  
+    }
 
   return EXIT_SUCCESS;
 }

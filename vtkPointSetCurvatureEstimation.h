@@ -19,21 +19,21 @@ class vtkPointSetCurvatureEstimation : public vtkPolyDataAlgorithm
     static vtkPointSetCurvatureEstimation *New();
     vtkTypeMacro(vtkPointSetCurvatureEstimation, vtkPolyDataAlgorithm);
     void PrintSelf(ostream &os, vtkIndent indent);
-    
+
     vtkGetMacro(Radius, float);
     vtkSetMacro(Radius, float);
-    
+
     vtkGetMacro(UseAutoRadius, bool);
     vtkSetMacro(UseAutoRadius, bool);
-    
+
     void SetAutoRadius(vtkPolyData* input);
-    
+
   protected:
     vtkPointSetCurvatureEstimation();
     ~vtkPointSetCurvatureEstimation(){}
-    
+
     int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *); //the function that makes this class work with the vtk pipeline
-    
+
   private:
     float Radius; // The radius of the sphere used to find neighbors to use in the local plane estimation.
     bool UseAutoRadius; // Specify if a radius should be automatically selected using a heuristic on the bounding box size. Default is true.

@@ -1,6 +1,6 @@
 // .NAME vtkPointSetNormalEstimation - Estimate normals of a point set using a local best fit plane.
 // .SECTION Description
-// At every point in the point set, vtkPointSetNormalEstimation computes the best 
+// At every point in the point set, vtkPointSetNormalEstimation computes the best
 // fit plane of the set of points within a specified radius of the point (or a fixed number of neighbors).
 // The normal of this plane is used as an estimate of the normal of the surface that would go through
 // the points.
@@ -33,18 +33,18 @@ class vtkPointSetNormalEstimation : public vtkPolyDataAlgorithm
     void SetModeToRadius();
 
     int IterateEvent;
-    
+
   protected:
     vtkPointSetNormalEstimation();
     ~vtkPointSetNormalEstimation() {};
     int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
-    
+
   private:
     unsigned int NumberOfNeighbors; // The number of neighbors to use in constructing the graph.
     float Radius;
     enum ModeEnum {FIXED_NUMBER, RADIUS};
     ModeEnum Mode;
-    
+
 };
 
 // Helper functions

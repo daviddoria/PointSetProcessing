@@ -55,12 +55,12 @@ void PointSetProcessingWidget::SharedConstructor()
   this->PointsMapper->SetInputConnection(this->PointsPolyData->GetProducerPort());
   this->PointsActor = vtkSmartPointer<vtkActor>::New();
   this->PointsActor->SetMapper(this->PointsMapper);
-  
+
   this->NormalEstimationFilter = vtkSmartPointer<vtkPointSetNormalEstimation>::New();
   this->NormalEstimationFilter->SetModeToRadius();
   this->NormalEstimationFilter->SetRadius(this->sldNeighborRadius->GetValue());
   this->NormalEstimationFilter->SetInputConnection(this->PointsPolyData->GetProducerPort());
-  
+
   this->NormalEstimationThread = new QThread;
   this->NormalEstimationComputationObject = new VTKComputationThread<vtkPointSetNormalEstimation>;
   this->NormalEstimationComputationObject->SetFilter(this->NormalEstimationFilter);
@@ -75,7 +75,7 @@ void PointSetProcessingWidget::SharedConstructor()
   this->HedgeHogFilter->SetVectorModeToUseNormal();
   this->HedgeHogFilter->SetScaleFactor(this->sldArrowSize->GetValue());
   this->HedgeHogFilter->Update();
-  
+
   this->NormalsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   this->NormalsMapper->SetInputConnection(this->HedgeHogFilter->GetOutputPort());
   this->NormalsActor = vtkSmartPointer<vtkActor>::New();
@@ -110,7 +110,7 @@ void PointSetProcessingWidget::on_btnGenerateNormals_clicked()
   connect(this->ProgressDialog, SIGNAL(canceled()), this, SLOT(slot_NormalEstimationCanceled()));
   this->ProgressDialog->setWindowModality(Qt::WindowModal);
   this->statusBar()->showMessage("Computing normals...");
-  
+
   this->Timer.start();
 
   // Estimate normals
@@ -119,7 +119,7 @@ void PointSetProcessingWidget::on_btnGenerateNormals_clicked()
 
 void PointSetProcessingWidget::on_btnOrientNormals_clicked()
 {
-  
+
 }
 
 void PointSetProcessingWidget::on_actionOpenFile_activated()
@@ -143,7 +143,7 @@ void PointSetProcessingWidget::OpenFile(const std::string& fileName)
   this->PointsPolyData->DeepCopy(reader->GetOutput());
   this->PointsPolyData->Modified();
   this->Renderer->ResetCamera();
-  
+
   double p0[3];
   this->PointsPolyData->GetPoint(0,p0);
   this->SphereActor->SetPosition(p0);
@@ -216,7 +216,7 @@ void PointSetProcessingWidget::on_btnOrientNormalsToPoint_clicked()
   orientationPoint[0] = coord[0];
   orientationPoint[1] = coord[1];
   orientationPoint[2] = coord[2];
-  
+
   vtkSmartPointer<vtkPointSetNormalOrientationToPoint> normalOrientationToPointFilter = vtkSmartPointer<vtkPointSetNormalOrientationToPoint>::New();
   normalOrientationToPointFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
   normalOrientationToPointFilter->SetOrientationPoint(orientationPoint);

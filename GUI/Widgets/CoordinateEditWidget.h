@@ -25,7 +25,7 @@ public:
   // The following are for the Designer interface
   double xText() const;
   void setXText(const double x);
-  
+
   double yText() const;
   void setYText(const double y);
 
@@ -33,7 +33,7 @@ public:
   void setZText(const double z);
 
 public slots:
-  
+
   void on_txtX_textChanged( const QString & text );
   void on_txtY_textChanged( const QString & text );
   void on_txtZ_textChanged( const QString & text );

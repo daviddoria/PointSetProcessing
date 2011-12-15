@@ -11,7 +11,7 @@
 #include "vtkPointSetNormalOrientation.h"
 
 template<class A>
-bool fuzzyCompare(A a, A b) 
+bool fuzzyCompare(A a, A b)
 {
   return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
@@ -25,11 +25,11 @@ int main (int argc, char *argv[])
     std::cout << "Required arguments: InputFilename GroundTruthFilename" << std::endl;
     return EXIT_FAILURE;
     }
-  
+
   // Parse command line arguments
   std::string inputFileName = argv[1];
   std::string groundTruthFileName = argv[2];
-  
+
   // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> inputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   inputReader->SetFileName(inputFileName.c_str());
@@ -39,7 +39,7 @@ int main (int argc, char *argv[])
   vtkSmartPointer<vtkPointSetNormalOrientation> normalOrientation = vtkSmartPointer<vtkPointSetNormalOrientation>::New();
   normalOrientation->SetInput(inputReader->GetOutput());
   normalOrientation->Update();
-  
+
   vtkPolyData* orientedNormalsPolyData = normalOrientation->GetOutput();
 
   // Read the ground truth file
@@ -48,7 +48,7 @@ int main (int argc, char *argv[])
   groundTruthReader->Update();
 
   vtkPolyData* groundTruthPolyData = groundTruthReader->GetOutput();
-  
+
   if(groundTruthPolyData->GetNumberOfPoints() != orientedNormalsPolyData->GetNumberOfPoints())
     {
     std::cout << "Number of points do not match!" << std::endl;
@@ -69,7 +69,7 @@ int main (int argc, char *argv[])
     double est[3];
     orientedNormals->GetTuple(i, est);
     groundTruthNormals->GetTuple(i, gt);
-  
+
     for(unsigned int p = 0; p < 3; p++)
       {
       if(!fuzzyCompare(gt[p], est[p]))
@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
         }
       }
-    }  
+    }
 
   return EXIT_SUCCESS;
 }

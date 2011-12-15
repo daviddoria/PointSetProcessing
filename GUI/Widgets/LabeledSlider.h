@@ -24,7 +24,7 @@ Q_PROPERTY( int maxValueText READ maxValueText WRITE setMaxValueText DESIGNABLE 
 
 signals:
   void valueChanged(int);
-  
+
 public slots:
   virtual void slot_horizontalSlider_valueChanged(int); // We can't use the named slot autoconnect here because we want to connect to a different slot in a subclass
   virtual void on_txtMin_textChanged( const QString & text );
@@ -38,7 +38,7 @@ public:
 
   void setMinimum(const unsigned int);
   void setMaximum(const unsigned int);
-  
+
   // The following functions are to support the widget in the Designer
   QString name();
   void setName(const QString& name);
@@ -51,7 +51,7 @@ public:
 
 protected:
   QIntValidator* Validator;
-  
+
   void SetCurrentValueLabel();
 
 };
