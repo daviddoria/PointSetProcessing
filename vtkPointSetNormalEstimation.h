@@ -32,6 +32,8 @@ class vtkPointSetNormalEstimation : public vtkPolyDataAlgorithm
     void SetModeToFixedNumber();
     void SetModeToRadius();
 
+    int IterateEvent;
+    
   protected:
     vtkPointSetNormalEstimation();
     ~vtkPointSetNormalEstimation() {};
@@ -42,6 +44,7 @@ class vtkPointSetNormalEstimation : public vtkPolyDataAlgorithm
     float Radius;
     enum ModeEnum {FIXED_NUMBER, RADIUS};
     ModeEnum Mode;
+    
 };
 
 // Helper functions - these should be included in VTK soon.

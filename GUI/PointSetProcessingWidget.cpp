@@ -2,6 +2,7 @@
 
 // Qt
 #include <QFileDialog>
+#include <QThread>
 
 // VTK
 #include <vtkArrowSource.h>
@@ -29,6 +30,12 @@ PointSetProcessingWidget::PointSetProcessingWidget(const std::string& fileName)
   OpenFile(fileName);
 }
 
+void PointSetProcessingWidget::slot_ProgressUpdate(int value)
+{
+  this->statusBar()->showMessage("Computing normal for point " + QString::number(value));
+  this->ProgressDialog->setValue(value);
+}
+
 void PointSetProcessingWidget::SharedConstructor()
 {
   this->setupUi(this);
@@ -52,12 +59,14 @@ void PointSetProcessingWidget::SharedConstructor()
   this->NormalEstimationFilter->SetRadius(this->sldNeighborRadius->GetValue());
   this->NormalEstimationFilter->SetInputConnection(this->PointsPolyData->GetProducerPort());
   
-  this->NormalEstimationThread = new VTKComputationThread<vtkPointSetNormalEstimation>;
-  this->NormalEstimationThread->SetFilter(this->NormalEstimationFilter);
+  this->NormalEstimationThread = new QThread;
+  this->NormalEstimationComputationObject = new VTKComputationThread<vtkPointSetNormalEstimation>;
+  this->NormalEstimationComputationObject->SetFilter(this->NormalEstimationFilter);
+  this->NormalEstimationComputationObject->moveToThread(this->NormalEstimationThread);
 
   // Normals
   this->NormalsPolyData = vtkSmartPointer<vtkPolyData>::New();
-  
+
   // Setup the arrows
   this->ArrowSource = vtkSmartPointer<vtkArrowSource>::New();
   this->ArrowSource->Update();
@@ -89,13 +98,25 @@ void PointSetProcessingWidget::SharedConstructor()
   this->progressBar->setMaximum(0);
   this->progressBar->hide();
 
-  connect(this->NormalEstimationThread, SIGNAL(StartProgressBarSignal()), this, SLOT(slot_StartProgressBar()));
-  connect(this->NormalEstimationThread, SIGNAL(StopProgressBarSignal()), this, SLOT(slot_StopProgressBar()));
-  connect(this->NormalEstimationThread, SIGNAL(StopProgressBarSignal()), this, SLOT(slot_NormalEstimationComplete()));
+  connect(this->NormalEstimationThread, SIGNAL(started()), this->NormalEstimationComputationObject, SLOT(start()));
+  connect(this->NormalEstimationThread, SIGNAL(started()), this, SLOT(slot_StartProgressBar()));
+  connect(this->NormalEstimationComputationObject, SIGNAL(finished()), this->NormalEstimationThread, SLOT(quit()));
+  connect(this->NormalEstimationComputationObject, SIGNAL(progressUpdate(int)), this, SLOT(slot_ProgressUpdate(int)));
+  connect(this->NormalEstimationComputationObject, SIGNAL(finished()), this, SLOT(slot_StopProgressBar()));
+  connect(this->NormalEstimationComputationObject, SIGNAL(finished()), this, SLOT(slot_NormalEstimationComplete()));
 }
 
 void PointSetProcessingWidget::on_btnGenerateNormals_clicked()
 {
+//   this->ProgressDialog = QProgressDialog("Generating normals...", "Abort", 0, this->PointsPolyData->GetNumberOfPoints(), this);
+//   this->ProgressDialog.setWindowModality(Qt::WindowModal);
+
+  this->ProgressDialog = new QProgressDialog("Generating normals...", "Abort", 0, this->PointsPolyData->GetNumberOfPoints(), this);
+  this->ProgressDialog->setWindowModality(Qt::WindowModal);
+  this->statusBar()->showMessage("Computing normals...");
+  
+  this->Timer.start();
+
   // Estimate normals
   this->NormalEstimationThread->start();
 }
@@ -161,6 +182,7 @@ void PointSetProcessingWidget::slot_StopProgressBar()
 
 void PointSetProcessingWidget::slot_NormalEstimationComplete()
 {
+  std::cout << "Operation took: " << QTime().addMSecs(this->Timer.elapsed()).second();
   // std::cout << "slot_NormalEstimationComplete()" << std::endl;
   this->NormalsPolyData->DeepCopy(this->NormalEstimationFilter->GetOutput());
   this->NormalsPolyData->Modified();

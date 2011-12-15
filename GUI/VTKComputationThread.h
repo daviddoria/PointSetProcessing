@@ -1,32 +1,32 @@
 #ifndef VTKComputationThread_H
 #define VTKComputationThread_H
 
-#include <QThread>
+#include <QObject>
 
-class FilterComputationThreadNonTemplated : public QThread
+#include <vtkObject.h>
+
+class FilterComputationThreadNonTemplated : public QObject
 {
 Q_OBJECT
+public slots:
+  virtual void start() = 0;
+
 signals:
-  // This signal is emitted to start the progress bar
-  void StartProgressBarSignal();
-
-  // This signal is emitted to stop the progress bar
-  void StopProgressBarSignal();
-
+  void finished();
+  void progressUpdate(int);
 };
 
 template <typename TFilter>
 class VTKComputationThread : public FilterComputationThreadNonTemplated
 {
-  public:
+public:
 
   VTKComputationThread();
 
-  // This function is called when the thread is started
-  void run();
+  void IterateCallbackFunction(vtkObject* caller, long unsigned int eventId, void* callData);
 
-  // This function is called when the thread is stopped
-  void exit();
+  // This function is called when the thread is started
+  void start();
 
   void SetFilter(TFilter* filter);
 

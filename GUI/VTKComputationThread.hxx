@@ -7,12 +7,9 @@ VTKComputationThread<TFilter>::VTKComputationThread()
 }
 
 template<typename TFilter>
-void VTKComputationThread<TFilter>::run()
+void VTKComputationThread<TFilter>::start()
 {
-  std::cout << "ProgressThread::run()" << std::endl;
-
-  // When the thread is started, emit the signal to start the marquee progress bar
-  emit StartProgressBarSignal();
+  std::cout << "VTKComputationThread::start()" << std::endl;
 
   if(this->Filter)
     {
@@ -24,20 +21,20 @@ void VTKComputationThread<TFilter>::run()
     }
 
   // When the function is finished, end the thread
-  exit();
-}
-
-template<typename TFilter>
-void VTKComputationThread<TFilter>::exit()
-{
-  std::cout << "ProgressThread::exit()" << std::endl;
-  
-  // When the thread is stopped, emit the signal to stop the marquee progress bar
-  emit StopProgressBarSignal();
+  emit finished();
 }
 
 template<typename TFilter>
 void VTKComputationThread<TFilter>::SetFilter(TFilter* filter)
 {
   this->Filter = filter;
+  this->Filter->AddObserver(this->Filter->IterateEvent, this, &VTKComputationThread<TFilter>::IterateCallbackFunction);
+}
+
+template<typename TFilter>
+void VTKComputationThread<TFilter>::IterateCallbackFunction(vtkObject* caller, long unsigned int eventId, void* callData)
+{
+  //std::cout << "Caught event." << std::endl;
+  int currentPoint = static_cast<int*>(callData)[0];
+  emit progressUpdate(currentPoint);
 }

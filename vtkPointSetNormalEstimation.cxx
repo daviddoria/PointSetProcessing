@@ -1,4 +1,5 @@
 #include <vtkCellArray.h>
+#include <vtkCommand.h>
 #include <vtkFloatArray.h>
 #include <vtkIdList.h>
 #include <vtkInformation.h>
@@ -21,6 +22,7 @@ vtkPointSetNormalEstimation::vtkPointSetNormalEstimation()
   this->NumberOfNeighbors = 4;
   this->Radius = 1.0;
   this->Mode = RADIUS;
+  this->IterateEvent = vtkCommand::UserEvent + 1;
 }
 
 void vtkPointSetNormalEstimation::SetModeToFixedNumber()
@@ -59,7 +61,7 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
   // Estimate the normal at each point.
   for(vtkIdType pointId = 0; pointId < input->GetNumberOfPoints(); ++pointId)
     {
-
+    this->InvokeEvent(this->IterateEvent, &pointId);
     double point[3];
     input->GetPoint(pointId, point);
 

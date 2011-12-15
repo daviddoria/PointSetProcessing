@@ -26,7 +26,7 @@ int main (int argc, char *argv[])
   // Write the result to a file
   vtkSmartPointer<vtkXMLPolyDataWriter> polyDataWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   polyDataWriter->SetInput(glyphFilter->GetOutput());
-  polyDataWriter->SetFileName("spherePoints.vtp");
+  polyDataWriter->SetFileName("SpherePoints.vtp");
   polyDataWriter->Write();
   
   return EXIT_SUCCESS;

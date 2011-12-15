@@ -5,6 +5,8 @@
 
 // Qt
 #include <QMainWindow>
+#include <QTime>
+#include <QProgressDialog>
 
 // VTK
 #include <vtkSmartPointer.h>
@@ -46,6 +48,8 @@ public slots:
   void on_sldNeighborRadius_valueChanged(float);
   void on_sldArrowSize_valueChanged(float);
 
+  void slot_ProgressUpdate(int);
+
 private:
   vtkSmartPointer<vtkPolyData> PointsPolyData;
   vtkSmartPointer<vtkPolyDataMapper> PointsMapper;
@@ -65,7 +69,13 @@ private:
   vtkSmartPointer<vtkActor> SphereActor;
     
   vtkSmartPointer<vtkPointSetNormalEstimation> NormalEstimationFilter;
-  VTKComputationThread<vtkPointSetNormalEstimation>* NormalEstimationThread;
+  VTKComputationThread<vtkPointSetNormalEstimation>* NormalEstimationComputationObject;
+  QThread* NormalEstimationThread;
+
+  QTime Timer;
+
+  //QProgressDialog ProgressDialog;
+  QProgressDialog* ProgressDialog;
 };
 
 #endif
