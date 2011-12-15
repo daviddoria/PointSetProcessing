@@ -6,23 +6,19 @@
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLPolyDataWriter.h>
 
-#if VTK_MAJOR_VERSION>5 || (VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>4)
-#include <vtkstd/limits>
-#else
 #include <limits>
-#endif
 
 #include "vtkPointSetNormalEstimation.h"
 
 template<class A>
 bool fuzzyCompare(A a, A b) 
 {
-  return fabs(a - b) < vtkstd::numeric_limits<A>::epsilon();
+  return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
 
 int main (int argc, char *argv[])
 {
-  //verify command line arguments
+  // Verify command line arguments
   if(argc != 3)
     {
     cout << "Required arguments not specified!" << endl;
@@ -30,21 +26,21 @@ int main (int argc, char *argv[])
     return EXIT_FAILURE;
     }
   
-  //parse command line arguments
-  vtkstd::string inputFilename = argv[1];
-  vtkstd::string groundTruthFilename = argv[2];
+  // Parse command line arguments
+  std::string inputFilename = argv[1];
+  std::string groundTruthFilename = argv[2];
   
-  //read the input file
+  // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> inputReader = 
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkSmartPointer<vtkXMLPolyDataReader>::New();
   inputReader->SetFileName(inputFilename.c_str());
   inputReader->Update();
   
-  //estimate normals
+  // Estimate normals
   vtkSmartPointer<vtkPointSetNormalEstimation> normalEstimation = 
       vtkSmartPointer<vtkPointSetNormalEstimation>::New();
   normalEstimation->SetInput(inputReader->GetOutput());
-  normalEstimation->SetkNeighbors(5);
+  normalEstimation->SetNumberOfNeighbors(5);
   normalEstimation->Update();
   
   vtkPolyData* estimatedNormalsPolyData = normalEstimation->GetOutput();
@@ -56,15 +52,15 @@ int main (int argc, char *argv[])
   writer->Write();
   */
   
-  //read the ground truth file
+  // Read the ground truth file
   vtkSmartPointer<vtkXMLPolyDataReader> groundTruthReader = 
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkSmartPointer<vtkXMLPolyDataReader>::New();
   groundTruthReader->SetFileName(groundTruthFilename.c_str());
   groundTruthReader->Update();
 
   vtkPolyData* groundTruthPolyData = groundTruthReader->GetOutput();
   
-  //check that the number of points match
+  // Check that the number of points match
   if(groundTruthPolyData->GetNumberOfPoints() != estimatedNormalsPolyData->GetNumberOfPoints())
     {
     cout << "Number of points does not match!" << endl;
@@ -73,13 +69,13 @@ int main (int argc, char *argv[])
     return EXIT_FAILURE;
     }
 
-  //get both sets of normals
-    vtkSmartPointer<vtkDoubleArray> groundTruthNormals = 
-            vtkDoubleArray::SafeDownCast(groundTruthPolyData->GetPointData()->GetNormals());
+  // Get both sets of normals
+  vtkSmartPointer<vtkDoubleArray> groundTruthNormals = 
+    vtkDoubleArray::SafeDownCast(groundTruthPolyData->GetPointData()->GetNormals());
   vtkSmartPointer<vtkDoubleArray> estimatedNormals =
-          vtkDoubleArray::SafeDownCast(estimatedNormalsPolyData->GetPointData()->GetNormals());
+    vtkDoubleArray::SafeDownCast(estimatedNormalsPolyData->GetPointData()->GetNormals());
 
-  for(unsigned int i = 0; i < groundTruthPolyData->GetNumberOfPoints(); i++)
+  for(vtkIdType i = 0; i < groundTruthPolyData->GetNumberOfPoints(); i++)
     {
     double gt[3];
     double est[3];
@@ -96,8 +92,7 @@ int main (int argc, char *argv[])
         return EXIT_FAILURE;
         }
       }
-    }  
+    }
 
-    
   return EXIT_SUCCESS;
 }

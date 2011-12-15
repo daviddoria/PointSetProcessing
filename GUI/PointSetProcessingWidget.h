@@ -33,6 +33,8 @@ public:
 
 public slots:
 
+  void on_btnOrientNormalsToPoint_clicked();
+  
   void on_btnGenerateNormals_clicked();
   void on_btnOrientNormals_clicked();
 

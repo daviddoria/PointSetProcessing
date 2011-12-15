@@ -11,30 +11,30 @@
 template<class A>
 bool fuzzyCompare(A a, A b) 
 {
-  return fabs(a - b) < vtkstd::numeric_limits<A>::epsilon();
+  return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
 
 int main (int argc, char *argv[])
 {
-  //verify command line arguments
+  // Verify command line arguments
   if(argc != 3)
     {
-    vtkstd::cout << "Required arguments: InputFilename GroundTruthFilename" << vtkstd::endl;
+    std::cout << "Required arguments: InputFilename GroundTruthFilename" << std::endl;
     return EXIT_FAILURE;
     }
   
-  //parse command line arguments
-  vtkstd::string InputFilename = argv[1];
-  vtkstd::string GroundTruthFilename = argv[2];
+  // Parse command line arguments
+  std::string InputFilename = argv[1];
+  std::string GroundTruthFilename = argv[2];
   
-  //read the input file
+  // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> InputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   InputReader->SetFileName(InputFilename.c_str());
   InputReader->Update();
   
   vtkPolyData* InputPolyData = InputReader->GetOutput();
   
-  //estimate normals
+  // Estimate normals
   vtkSmartPointer<vtkRiemannianGraphFilter> RiemannianGraphFilter = vtkSmartPointer<vtkRiemannianGraphFilter>::New();
   RiemannianGraphFilter->SetkNeighbors(3);
   RiemannianGraphFilter->SetInput(InputReader->GetOutput());
@@ -42,7 +42,7 @@ int main (int argc, char *argv[])
   
   vtkGraph* RiemannianGraph = RiemannianGraphFilter->GetOutput();
 
-  //read the ground truth file
+  // Read the ground truth file
   vtkSmartPointer<vtkGraphReader> GroundTruthReader = vtkSmartPointer<vtkGraphReader>::New();
   GroundTruthReader->SetFileName(GroundTruthFilename.c_str());
   GroundTruthReader->Update();
@@ -51,19 +51,19 @@ int main (int argc, char *argv[])
   
   if(GroundTruth->GetNumberOfVertices() != RiemannianGraph->GetNumberOfVertices())
     {
-      vtkstd::cout << "GroundTruth->GetNumberOfVertices() != RiemannianGraph->GetNumberOfVertices()" << vtkstd::endl;
-    vtkstd::cout << "ground truth: " << GroundTruth->GetNumberOfVertices() << vtkstd::endl;
-    vtkstd::cout << "nearest neighbor graph: " << RiemannianGraph->GetNumberOfVertices() << vtkstd::endl;
+    std::cout << "GroundTruth->GetNumberOfVertices() != RiemannianGraph->GetNumberOfVertices()" << std::endl;
+    std::cout << "ground truth: " << GroundTruth->GetNumberOfVertices() << std::endl;
+    std::cout << "nearest neighbor graph: " << RiemannianGraph->GetNumberOfVertices() << std::endl;
     return EXIT_FAILURE;
     }
 
     if(GroundTruth->GetNumberOfEdges() != RiemannianGraph->GetNumberOfEdges())
-    {
-      vtkstd::cout << "GroundTruth->GetNumberOfEdges() != RiemannianGraph->GetNumberOfEdges()" << vtkstd::endl;
-    vtkstd::cout << "ground truth: " << GroundTruth->GetNumberOfEdges() << vtkstd::endl;
-    vtkstd::cout << "nearest neighbor graph: " << RiemannianGraph->GetNumberOfEdges() << vtkstd::endl;
-    return EXIT_FAILURE;
-    }
+      {
+      std::cout << "GroundTruth->GetNumberOfEdges() != RiemannianGraph->GetNumberOfEdges()" << std::endl;
+      std::cout << "ground truth: " << GroundTruth->GetNumberOfEdges() << std::endl;
+      std::cout << "nearest neighbor graph: " << RiemannianGraph->GetNumberOfEdges() << std::endl;
+      return EXIT_FAILURE;
+      }
 
   return EXIT_SUCCESS;
 }

@@ -6,23 +6,19 @@
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLPolyDataWriter.h>
 
-#if VTK_MAJOR_VERSION>5 || (VTK_MAJOR_VERSION==5 && VTK_MINOR_VERSION>4)
-#include <vtkstd/limits>
-#else
 #include <limits>
-#endif
 
 #include "vtkPointSetCurvatureEstimation.h"
 
 template<class A>
 bool fuzzyCompare(A a, A b) 
 {
-  return fabs(a - b) < vtkstd::numeric_limits<A>::epsilon();
+  return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
 
 int main (int argc, char *argv[])
 {
-  //verify command line arguments
+  // Verify command line arguments
   if(argc != 3)
     {
     cout << "Required arguments not specified!" << endl;
@@ -30,13 +26,13 @@ int main (int argc, char *argv[])
     return EXIT_FAILURE;
     }
   
-  //parse command line arguments
+  // Parse command line arguments
   vtkstd::string inputFilename = argv[1];
   vtkstd::string groundTruthFilename = argv[2];
   
-  //read the input file
+  // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> inputReader = 
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkSmartPointer<vtkXMLPolyDataReader>::New();
   inputReader->SetFileName(inputFilename.c_str());
   inputReader->Update();
   
@@ -46,17 +42,17 @@ int main (int argc, char *argv[])
     return EXIT_FAILURE;
     }
   
-  //estimate normals
+  // Estimate normals
   vtkSmartPointer<vtkPointSetCurvatureEstimation> curvatureEstimation = 
-      vtkSmartPointer<vtkPointSetCurvatureEstimation>::New();
+    vtkSmartPointer<vtkPointSetCurvatureEstimation>::New();
   curvatureEstimation->SetInput(inputReader->GetOutput());
   curvatureEstimation->Update();
   
   vtkPolyData* curvatureEstimate = curvatureEstimation->GetOutput();
 
-  //read the ground truth file
+  // Read the ground truth file
   vtkSmartPointer<vtkXMLPolyDataReader> groundTruthReader = 
-      vtkSmartPointer<vtkXMLPolyDataReader>::New();
+    vtkSmartPointer<vtkXMLPolyDataReader>::New();
   groundTruthReader->SetFileName(groundTruthFilename.c_str());
   groundTruthReader->Update();
 
@@ -77,9 +73,9 @@ int main (int argc, char *argv[])
     }
 
   vtkDoubleArray* groundTruthCurvature = 
-      vtkDoubleArray::SafeDownCast ( groundTruth->GetPointData()->GetArray ( "Curvature" ) );
+    vtkDoubleArray::SafeDownCast ( groundTruth->GetPointData()->GetArray ( "Curvature" ) );
   vtkDoubleArray* estimatedCurvature = 
-      vtkDoubleArray::SafeDownCast ( curvatureEstimate->GetPointData()->GetArray ( "Curvature" ) );
+    vtkDoubleArray::SafeDownCast ( curvatureEstimate->GetPointData()->GetArray ( "Curvature" ) );
   
   for(unsigned int i = 0; i < groundTruth->GetNumberOfPoints(); i++)
     {

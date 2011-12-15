@@ -44,7 +44,7 @@ int vtkPointSetNormalOrientationToPoint::RequestData(vtkInformation *vtkNotUsed(
 
   // Traverse the points and flip normals if necessary
   for(vtkIdType pointId = 0; pointId < input->GetNumberOfPoints(); ++pointId)
-  {
+    {
     // Get the current point.
     double p[3];
     input->GetPoint(pointId, p);
@@ -62,7 +62,7 @@ int vtkPointSetNormalOrientationToPoint::RequestData(vtkInformation *vtkNotUsed(
       }
 
     orientedNormals->SetTuple(pointId, oldNormal);
-  }
+    }
 
   output->ShallowCopy(input);
   output->GetPointData()->SetNormals(orientedNormals);

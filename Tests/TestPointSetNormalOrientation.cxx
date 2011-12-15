@@ -13,36 +13,36 @@
 template<class A>
 bool fuzzyCompare(A a, A b) 
 {
-  return fabs(a - b) < vtkstd::numeric_limits<A>::epsilon();
+  return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
 
 int main (int argc, char *argv[])
 {
-  //verify command line arguments
+  // Verify command line arguments
   if(argc != 3)
     {
-    vtkstd::cout << "Required arguments invalid!" << vtkstd::endl;
-    vtkstd::cout << "Required arguments: InputFilename GroundTruthFilename" << vtkstd::endl;
+    std::cout << "Required arguments invalid!" << std::endl;
+    std::cout << "Required arguments: InputFilename GroundTruthFilename" << std::endl;
     return EXIT_FAILURE;
     }
   
-  //parse command line arguments
-  vtkstd::string InputFilename = argv[1];
-  vtkstd::string GroundTruthFilename = argv[2];
+  // Parse command line arguments
+  std::string InputFilename = argv[1];
+  std::string GroundTruthFilename = argv[2];
   
-  //read the input file
+  // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> InputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   InputReader->SetFileName(InputFilename.c_str());
   InputReader->Update();
-  
-  //estimate normals
+
+  // Estimate normals
   vtkSmartPointer<vtkPointSetNormalOrientation> NormalOrientation = vtkSmartPointer<vtkPointSetNormalOrientation>::New();
   NormalOrientation->SetInput(InputReader->GetOutput());
   NormalOrientation->Update();
   
   vtkPolyData* OrientedNormalsPolyData = NormalOrientation->GetOutput();
 
-  //read the ground truth file
+  // Read the ground truth file
   vtkSmartPointer<vtkXMLPolyDataReader> GroundTruthReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   GroundTruthReader->SetFileName(GroundTruthFilename.c_str());
   GroundTruthReader->Update();
@@ -51,19 +51,18 @@ int main (int argc, char *argv[])
   
   if(GroundTruthPolyData->GetNumberOfPoints() != OrientedNormalsPolyData->GetNumberOfPoints())
     {
-    vtkstd::cout << "Number of points do not match!" << vtkstd::endl;
-    vtkstd::cout << "Ground truth points: " << GroundTruthPolyData->GetNumberOfPoints() << vtkstd::endl;
-    vtkstd::cout << "Input points: " << OrientedNormalsPolyData->GetNumberOfPoints() << vtkstd::endl;
+    std::cout << "Number of points do not match!" << std::endl;
+    std::cout << "Ground truth points: " << GroundTruthPolyData->GetNumberOfPoints() << std::endl;
+    std::cout << "Input points: " << OrientedNormalsPolyData->GetNumberOfPoints() << std::endl;
     return EXIT_FAILURE;
     }
 
-  //get both sets of normals
+  // Get both sets of normals
   vtkSmartPointer<vtkDoubleArray> GroundTruthNormals = 
-      vtkDoubleArray::SafeDownCast(GroundTruthPolyData->GetPointData()->GetNormals());
+    vtkDoubleArray::SafeDownCast(GroundTruthPolyData->GetPointData()->GetNormals());
   vtkSmartPointer<vtkDoubleArray> OrientedNormals =
-      vtkDoubleArray::SafeDownCast(OrientedNormalsPolyData->GetPointData()->GetNormals());
+    vtkDoubleArray::SafeDownCast(OrientedNormalsPolyData->GetPointData()->GetNormals());
 
-  
   for(unsigned int i = 0; i < GroundTruthPolyData->GetNumberOfPoints(); i++)
   {
     double gt[3];
@@ -75,9 +74,9 @@ int main (int argc, char *argv[])
     {
       if(!fuzzyCompare(gt[p], est[p]))
       {
-        vtkstd::cout << "!fuzzyCompare(gt[p], est[p]))" << vtkstd::endl;
-        vtkstd::cout << "gt: " << gt[p] << vtkstd::endl;
-        vtkstd::cout << "est: " << est[p] << vtkstd::endl;
+        std::cout << "!fuzzyCompare(gt[p], est[p]))" << std::endl;
+        std::cout << "gt: " << gt[p] << std::endl;
+        std::cout << "est: " << est[p] << std::endl;
         return EXIT_FAILURE;
       }
     }

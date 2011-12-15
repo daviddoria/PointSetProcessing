@@ -19,6 +19,7 @@
 
 // Custom
 #include "vtkPointSetNormalEstimation.h"
+#include "vtkPointSetNormalOrientationToPoint.h"
 
 PointSetProcessingWidget::PointSetProcessingWidget(QMainWindow *parent)
 {
@@ -181,6 +182,7 @@ void PointSetProcessingWidget::slot_NormalEstimationComplete()
   // std::cout << "slot_NormalEstimationComplete()" << std::endl;
   this->NormalsPolyData->DeepCopy(this->NormalEstimationFilter->GetOutput());
   this->NormalsPolyData->Modified();
+
   this->qvtkWidget->GetRenderWindow()->Render();
 }
 
@@ -203,5 +205,25 @@ void PointSetProcessingWidget::on_sldArrowSize_valueChanged(float value)
   // std::cout << "on_sldArrowSize_valueChanged to " << value << std::endl;
   this->HedgeHogFilter->SetScaleFactor(value);
   this->HedgeHogFilter->Update();
+  this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+void PointSetProcessingWidget::on_btnOrientNormalsToPoint_clicked()
+{
+  double orientationPoint[3];
+
+  QVector<double> coord = this->coordOrientationPoint->GetCoordinate();
+  orientationPoint[0] = coord[0];
+  orientationPoint[1] = coord[1];
+  orientationPoint[2] = coord[2];
+  
+  vtkSmartPointer<vtkPointSetNormalOrientationToPoint> normalOrientationToPointFilter = vtkSmartPointer<vtkPointSetNormalOrientationToPoint>::New();
+  normalOrientationToPointFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
+  normalOrientationToPointFilter->SetOrientationPoint(orientationPoint);
+  normalOrientationToPointFilter->Update();
+
+  this->NormalsPolyData->DeepCopy(normalOrientationToPointFilter->GetOutput());
+  this->NormalsPolyData->Modified();
+
   this->qvtkWidget->GetRenderWindow()->Render();
 }

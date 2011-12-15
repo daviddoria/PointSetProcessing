@@ -16,23 +16,23 @@ int main (int argc, char *argv[])
     }
   
   // Parse command line arguments
-  std::string InputFilename = argv[1];
-  std::string OutputFilename = argv[2];
+  std::string inputFileName = argv[1];
+  std::string outputFileName = argv[2];
   
   // Read the input file
-  vtkSmartPointer<vtkXMLPolyDataReader> Reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  Reader->SetFileName(InputFilename.c_str());
-  Reader->Update();
+  vtkSmartPointer<vtkXMLPolyDataReader> reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+  reader->SetFileName(inputFileName.c_str());
+  reader->Update();
   
   // Estimate normals
-  vtkSmartPointer<vtkPointSetNormalEstimation> NormalEstimation = vtkSmartPointer<vtkPointSetNormalEstimation>::New();
-  NormalEstimation->SetInput(Reader->GetOutput());
-  NormalEstimation->Update();
+  vtkSmartPointer<vtkPointSetNormalEstimation> normalEstimation = vtkSmartPointer<vtkPointSetNormalEstimation>::New();
+  normalEstimation->SetInput(reader->GetOutput());
+  normalEstimation->Update();
   
   // Write the output file with the estimated normals
   vtkSmartPointer<vtkXMLPolyDataWriter> Writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-  Writer->SetFileName(OutputFilename.c_str());
-  Writer->SetInput(NormalEstimation->GetOutput());
+  Writer->SetFileName(outputFileName.c_str());
+  Writer->SetInput(normalEstimation->GetOutput());
   Writer->Write();
   
   return 0;

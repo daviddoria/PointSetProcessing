@@ -11,28 +11,28 @@
 template<class A>
 bool fuzzyCompare(A a, A b) 
 {
-  return fabs(a - b) < vtkstd::numeric_limits<A>::epsilon();
+  return fabs(a - b) < std::numeric_limits<A>::epsilon();
 }
 
 int main (int argc, char *argv[])
 {
-  //verify command line arguments
+  // Verify command line arguments
   if(argc != 3)
     {
-    vtkstd::cout << "Required arguments: InputFilename GroundTruthFilename" << vtkstd::endl;
+    std::cout << "Required arguments: InputFilename GroundTruthFilename" << vtkstd::endl;
     return EXIT_FAILURE;
     }
   
-  //parse command line arguments
-  vtkstd::string InputFilename = argv[1];
-  vtkstd::string GroundTruthFilename = argv[2];
+  // Parse command line arguments
+  std::string InputFilename = argv[1];
+  std::string GroundTruthFilename = argv[2];
   
-  //read the input file
+  // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> InputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   InputReader->SetFileName(InputFilename.c_str());
   InputReader->Update();
   
-  //estimate normals
+  // Estimate normals
   vtkSmartPointer<vtkPointSetOutlierRemoval> OutlierRemoval = vtkSmartPointer<vtkPointSetOutlierRemoval>::New();
   OutlierRemoval->SetInput(InputReader->GetOutput());
   OutlierRemoval->SetPercentToRemove(.01); //remove 1% of the points
@@ -40,7 +40,7 @@ int main (int argc, char *argv[])
   
   vtkPolyData* OutliersRemoved = OutlierRemoval->GetOutput();
 
-  //read the ground truth file
+  // Read the ground truth file
   vtkSmartPointer<vtkXMLPolyDataReader> GroundTruthReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   GroundTruthReader->SetFileName(GroundTruthFilename.c_str());
   GroundTruthReader->Update();
@@ -48,9 +48,9 @@ int main (int argc, char *argv[])
   vtkPolyData* GroundTruth = GroundTruthReader->GetOutput();
   if(GroundTruth->GetNumberOfPoints() != OutliersRemoved->GetNumberOfPoints())
     {
-    vtkstd::cout << "GroundTruth->GetNumberOfPoints() != OutliersRemoved->GetNumberOfPoints()" << vtkstd::endl;
-    vtkstd::cout << "GroundTruth->GetNumberOfPoints() = " << GroundTruth->GetNumberOfPoints() << vtkstd::endl;
-    vtkstd::cout << "OutliersRemoved->GetNumberOfPoints() = " << OutliersRemoved->GetNumberOfPoints() << vtkstd::endl;
+    std::cout << "GroundTruth->GetNumberOfPoints() != OutliersRemoved->GetNumberOfPoints()" << std::endl;
+    std::cout << "GroundTruth->GetNumberOfPoints() = " << GroundTruth->GetNumberOfPoints() << std::endl;
+    std::cout << "OutliersRemoved->GetNumberOfPoints() = " << OutliersRemoved->GetNumberOfPoints() << std::endl;
     return EXIT_FAILURE;
     }
 
@@ -64,7 +64,7 @@ int main (int argc, char *argv[])
       {
       if(!fuzzyCompare(gt[p], n[p]))
         {
-        vtkstd::cout << "!fuzzyCompare(gt[p], n[p])" << vtkstd::endl;
+        std::cout << "!fuzzyCompare(gt[p], n[p])" << std::endl;
         return EXIT_FAILURE;
         }
       }

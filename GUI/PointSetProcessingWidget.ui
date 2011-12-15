@@ -57,6 +57,23 @@
        </widget>
       </item>
       <item>
+       <widget class="CoordinateEditWidget" name="coordOrientationPoint">
+        <property name="toolTip">
+         <string>CoordinateEditWidget</string>
+        </property>
+        <property name="whatsThis">
+         <string>Edit a coordinate value.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnOrientNormalsToPoint">
+        <property name="text">
+         <string>Orient to Point</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnOrientNormals">
         <property name="text">
          <string>Orient Normals</string>
@@ -87,7 +104,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>28</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -113,14 +130,19 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>LabeledSlider</class>
+   <extends>QWidget</extends>
+   <header>LabeledSlider.h</header>
+  </customwidget>
+  <customwidget>
    <class>FloatSlider</class>
    <extends>LabeledSlider</extends>
    <header>FloatSlider.h</header>
   </customwidget>
   <customwidget>
-   <class>LabeledSlider</class>
+   <class>CoordinateEditWidget</class>
    <extends>QWidget</extends>
-   <header>LabeledSlider.h</header>
+   <header>CoordinateEditWidget.h</header>
   </customwidget>
   <customwidget>
    <class>QVTKWidget</class>
