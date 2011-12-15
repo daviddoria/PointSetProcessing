@@ -32,7 +32,7 @@ PointSetProcessingWidget::PointSetProcessingWidget(const std::string& fileName)
 
 void PointSetProcessingWidget::slot_ProgressUpdate(int value)
 {
-  this->statusBar()->showMessage("Computing normal for point " + QString::number(value));
+  //this->statusBar()->showMessage("Computing normal for point " + QString::number(value));
   this->ProgressDialog->setValue(value);
 }
 
@@ -108,10 +108,8 @@ void PointSetProcessingWidget::SharedConstructor()
 
 void PointSetProcessingWidget::on_btnGenerateNormals_clicked()
 {
-//   this->ProgressDialog = QProgressDialog("Generating normals...", "Abort", 0, this->PointsPolyData->GetNumberOfPoints(), this);
-//   this->ProgressDialog.setWindowModality(Qt::WindowModal);
-
-  this->ProgressDialog = new QProgressDialog("Generating normals...", "Abort", 0, this->PointsPolyData->GetNumberOfPoints(), this);
+  this->ProgressDialog = new QProgressDialog("Generating normals...", "Abort", 0, this->PointsPolyData->GetNumberOfPoints() - 1, this);
+  connect(this->ProgressDialog, SIGNAL(canceled()), this, SLOT(slot_NormalEstimationCanceled()));
   this->ProgressDialog->setWindowModality(Qt::WindowModal);
   this->statusBar()->showMessage("Computing normals...");
   
@@ -187,6 +185,11 @@ void PointSetProcessingWidget::slot_NormalEstimationComplete()
   this->NormalsPolyData->DeepCopy(this->NormalEstimationFilter->GetOutput());
   this->NormalsPolyData->Modified();
   this->qvtkWidget->GetRenderWindow()->Render();
+}
+
+void PointSetProcessingWidget::slot_NormalEstimationCanceled()
+{
+  delete this->NormalEstimationThread;
 }
 
 void PointSetProcessingWidget::on_sldNeighborRadius_valueChanged(float value)

@@ -47,8 +47,11 @@ class vtkPointSetNormalEstimation : public vtkPolyDataAlgorithm
     
 };
 
-// Helper functions - these should be included in VTK soon.
-void BestFitPlane(vtkPoints *points, vtkPlane *BestPlane);
+// Helper functions
+void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane, vtkIdList* idsToUse);
+void CenterOfMass(vtkPoints* points, double* center, vtkIdList* idsToUse);
+
+void BestFitPlane(vtkPoints* points, vtkPlane* BestPlane);
 void CenterOfMass(vtkPoints* points, double* Center);
 
 #endif

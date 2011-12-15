@@ -77,16 +77,17 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
 
     // std::cout << neighborIds->GetNumberOfIds() << " neighbors." << std::endl;
 
-    vtkSmartPointer<vtkPoints> neighbors = vtkSmartPointer<vtkPoints>::New();
-    for(unsigned int p = 0; p < neighborIds->GetNumberOfIds(); p++)
-      {
-      double neighbor[3];
-      input->GetPoint(neighborIds->GetId(p), neighbor);
-      neighbors->InsertNextPoint(neighbor);
-      }
+//     vtkSmartPointer<vtkPoints> neighbors = vtkSmartPointer<vtkPoints>::New();
+//     for(vtkIdType p = 0; p < neighborIds->GetNumberOfIds(); p++)
+//       {
+//       double neighbor[3];
+//       input->GetPoint(neighborIds->GetId(p), neighbor);
+//       neighbors->InsertNextPoint(neighbor);
+//       }
 
     vtkSmartPointer<vtkPlane> bestPlane = vtkSmartPointer<vtkPlane>::New();
-    BestFitPlane(neighbors, bestPlane);
+    //BestFitPlane(neighbors, bestPlane);
+    BestFitPlane(input->GetPoints(), bestPlane, neighborIds);
     double normal[3];
     bestPlane->GetNormal(normal);
     normalArray->SetTuple( pointId, normal ) ;
@@ -107,6 +108,29 @@ void vtkPointSetNormalEstimation::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "NumberOfNeighbors: " << this->NumberOfNeighbors << endl;
   os << indent << "Radius: " << this->Radius << endl;
   os << indent << "Mode: " << this->Mode << endl;
+}
+
+void CenterOfMass(vtkPoints* points, double* center, vtkIdList* idsToUse)
+{
+  // Compute the center of mass of a set of points.
+  center[0] = 0.0;
+  center[1] = 0.0;
+  center[2] = 0.0;
+
+  for(vtkIdType i = 0; i < idsToUse->GetNumberOfIds(); i++)
+    {
+    double point[3];
+    points->GetPoint(idsToUse->GetId(i), point);
+
+    center[0] += point[0];
+    center[1] += point[1];
+    center[2] += point[2];
+    }
+
+  double numberOfPoints = static_cast<double>(idsToUse->GetNumberOfIds());
+  center[0] = center[0]/numberOfPoints;
+  center[1] = center[1]/numberOfPoints;
+  center[2] = center[2]/numberOfPoints;
 }
 
 void CenterOfMass(vtkPoints* points, double* center)
@@ -156,7 +180,7 @@ template<class TReal>
   delete[] m;
 }
 
-void BestFitPlane(vtkPoints *points, vtkPlane *bestPlane)
+void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane)
 {
   // Compute the best fit (least squares) plane through a set of points.
   vtkIdType numPoints = points->GetNumberOfPoints();
@@ -173,7 +197,7 @@ void BestFitPlane(vtkPoints *points, vtkPlane *bestPlane)
   a[1][0] = 0; a[1][1] = 0;  a[1][2] = 0;
   a[2][0] = 0; a[2][1] = 0;  a[2][2] = 0;
   
-  for(unsigned int pointId = 0; pointId < numPoints; pointId++ )
+  for(vtkIdType pointId = 0; pointId < numPoints; pointId++ )
     {
     double x[3];
     double xp[3];
@@ -212,6 +236,67 @@ void BestFitPlane(vtkPoints *points, vtkPlane *bestPlane)
   free_matrix(eigvec);
   free_matrix(a);
   
+  // Set the plane origin to the center of mass
+  bestPlane->SetOrigin(center[0], center[1], center[2]);
+
+}
+
+void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane, vtkIdList* idsToUse)
+{
+  // Compute the best fit (least squares) plane through a set of points.
+  vtkIdType numPoints = idsToUse->GetNumberOfIds();
+  double dNumPoints = static_cast<double>(numPoints);
+
+  // Find the center of mass of the points
+  double center[3];
+  CenterOfMass(points, center, idsToUse);
+  // std::cout << "Center of mass: " << Center[0] << " " << Center[1] << " " << Center[2] << vtkstd::endl;
+
+  //Compute sample covariance matrix
+  double **a = create_matrix<double> ( 3,3 );
+  a[0][0] = 0; a[0][1] = 0;  a[0][2] = 0;
+  a[1][0] = 0; a[1][1] = 0;  a[1][2] = 0;
+  a[2][0] = 0; a[2][1] = 0;  a[2][2] = 0;
+
+  for(vtkIdType pointId = 0; pointId < numPoints; pointId++ )
+    {
+    double x[3];
+    double xp[3];
+    points->GetPoint(idsToUse->GetId(pointId), x);
+    xp[0] = x[0] - center[0];
+    xp[1] = x[1] - center[1];
+    xp[2] = x[2] - center[2];
+    for (unsigned int i = 0; i < 3; i++)
+      {
+      a[0][i] += xp[0] * xp[i];
+      a[1][i] += xp[1] * xp[i];
+      a[2][i] += xp[2] * xp[i];
+      }
+    }
+
+  // Divide by N-1
+  for(unsigned int i = 0; i < 3; i++)
+    {
+    a[0][i] /= dNumPoints-1;
+    a[1][i] /= dNumPoints-1;
+    a[2][i] /= dNumPoints-1;
+    }
+
+  // Extract eigenvectors from covariance matrix
+  double **eigvec = create_matrix<double> ( 3,3 );
+
+  double eigval[3];
+  vtkMath::Jacobi(a,eigval,eigvec);
+
+  //Jacobi iteration for the solution of eigenvectors/eigenvalues of a 3x3 real symmetric matrix. Square 3x3 matrix a; output eigenvalues in w; and output eigenvectors in v. Resulting eigenvalues/vectors are sorted in decreasing order; eigenvectors are normalized.
+
+  // Set the plane normal to the smallest eigen vector
+  bestPlane->SetNormal(eigvec[0][2], eigvec[1][2], eigvec[2][2]);
+
+  // Cleanup
+  free_matrix(eigvec);
+  free_matrix(a);
+
   // Set the plane origin to the center of mass
   bestPlane->SetOrigin(center[0], center[1], center[2]);
 

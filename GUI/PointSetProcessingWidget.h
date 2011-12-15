@@ -44,6 +44,7 @@ public slots:
   void slot_StopProgressBar();
 
   void slot_NormalEstimationComplete();
+  void slot_NormalEstimationCanceled();
 
   void on_sldNeighborRadius_valueChanged(float);
   void on_sldArrowSize_valueChanged(float);

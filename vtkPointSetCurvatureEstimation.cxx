@@ -1,16 +1,17 @@
-#include <vtkObjectFactory.h>
-#include <vtkIdList.h>
-#include <vtkPoints.h>
+#include <vtkBoundingBox.h>
 #include <vtkCellArray.h>
 #include <vtkDoubleArray.h>
-#include <vtkPointData.h>
+#include <vtkFloatArray.h>
+#include <vtkIdList.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
-#include <vtkPlane.h>
-#include <vtkPolyData.h>
 #include <vtkKdTreePointLocator.h>
 #include <vtkMath.h>
-#include <vtkBoundingBox.h>
+#include <vtkObjectFactory.h>
+#include <vtkPoints.h>
+#include <vtkPointData.h>
+#include <vtkPlane.h>
+#include <vtkPolyData.h>
 
 #include "vtkPointSetNormalEstimation.h"
 #include "vtkPointSetCurvatureEstimation.h"
@@ -40,17 +41,17 @@ void vtkPointSetCurvatureEstimation::SetAutoRadius(vtkPolyData* input)
 {
   //Compute and set the radius of the nearest neighbor sphere.
   
-  vtkBoundingBox Box;
+  vtkBoundingBox box;
   //Construct the point set bounding box.
-  for(unsigned int i = 0; i < input->GetNumberOfPoints(); i++)
-  {
+  for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
+    {
     double p[3];
     input->GetPoint(i,p);
-    Box.AddPoint(p);
-  }
+    box.AddPoint(p);
+    }
   
   //Set the radius to a heuristic on the bounding box diagonal length.
-  this->Radius = .2 * Box.GetDiagonalLength();
+  this->Radius = .2 * box.GetDiagonalLength();
   
   this->Modified();
 }
@@ -59,62 +60,63 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
                                  vtkInformationVector **inputVector,
                                  vtkInformationVector *outputVector)
 {
-  // get the info objects
+  // Get the info objects
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  // get the input and ouptut
+  // Get the input and ouptut
   vtkPolyData *input = vtkPolyData::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkPolyData *output = vtkPolyData::SafeDownCast(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  //compute a reasonable radius automatically if requested
+  // Compute a reasonable radius automatically if requested
   if(UseAutoRadius)
     {
     SetAutoRadius(input);
     }
     
-  //create curvature array
+  // Create curvature array
   vtkSmartPointer<vtkDoubleArray> Curvature = vtkSmartPointer<vtkDoubleArray>::New();
   Curvature->SetNumberOfComponents( 1 );
   Curvature->SetNumberOfTuples( input->GetNumberOfPoints() );
   Curvature->SetName( "Curvature" );
   
-  //get the normals
-  vtkDoubleArray* Normals = vtkDoubleArray::SafeDownCast(input->GetPointData()->GetNormals());
-    
-  //if normals are not present or the number of normals does not match the number of points, fail
-  if(!(Normals && (Normals->GetNumberOfTuples() == input->GetNumberOfPoints())))
+  // Get the normals
+  //vtkDoubleArray* Normals = vtkDoubleArray::SafeDownCast(input->GetPointData()->GetNormals());
+  vtkFloatArray* normals = vtkFloatArray::SafeDownCast(input->GetPointData()->GetNormals());
+
+  // If normals are not present or the number of normals does not match the number of points, fail
+  if(!(normals && (normals->GetNumberOfTuples() == input->GetNumberOfPoints())))
     {
     vtkErrorMacro("The input points must have normals!");
     return 0;
     }
     
-  //build a KDTree
+  // Build a KDTree
   vtkSmartPointer<vtkKdTreePointLocator> KDTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
   KDTree->SetDataSet(input);
   KDTree->BuildLocator();
   
-  //for each point in the data, get the points
-  for(unsigned int i = 0; i < input->GetNumberOfPoints(); i++)
+  // For each point in the data, get the points
+  for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
     {
-    //this iteration through the loop computes the ith points' curvature
+    // This iteration through the loop computes the ith points' curvature
     double point[3];
     input->GetPoint(i, point);
 
     vtkSmartPointer<vtkPlane> plane = vtkSmartPointer<vtkPlane>::New();
     double normal[3];
-    Normals->GetTuple(i,normal);
+    normals->GetTuple(i,normal);
     plane->SetNormal(normal);
     plane->SetOrigin(point);
       
     vtkSmartPointer<vtkIdList> neighborIds = vtkSmartPointer<vtkIdList>::New();
     KDTree->FindPointsWithinRadius(this->Radius, point, neighborIds);
     
-    //put all the points that are within the specified radius into a vtkPoints object
+    // Put all the points that are within the specified radius into a vtkPoints object
     vtkSmartPointer<vtkPoints> neighbors = vtkSmartPointer<vtkPoints>::New();
-    for(unsigned int p = 0; p < neighborIds->GetNumberOfIds(); p++)
+    for(vtkIdType p = 0; p < neighborIds->GetNumberOfIds(); p++)
       {
       double neighbor[3];
       input->GetPoint(neighborIds->GetId(p), neighbor);
@@ -123,7 +125,7 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
     
     //compute the average distance from all of the points inside the radius to the plane
     double TotalDistance = 0.0;
-    for(unsigned int p = 0; p < neighborIds->GetNumberOfIds(); p++)
+    for(vtkIdType p = 0; p < neighborIds->GetNumberOfIds(); p++)
       {
       double neighbor[3];
       input->GetPoint(neighborIds->GetId(p), neighbor);
@@ -137,10 +139,10 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
   
   output->ShallowCopy(input);
   
-  //normalize curvature (0,1)
-  //find max value
+  // Normalize curvature (0,1)
+  // Find max value
   double maxValue = 0.0;
-  for(unsigned int i = 0; i < Curvature->GetNumberOfTuples(); i++)
+  for(vtkIdType i = 0; i < Curvature->GetNumberOfTuples(); i++)
     {
     double val = Curvature->GetValue(i);
     if(val > maxValue)
@@ -149,8 +151,8 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
       }
     }
     
-  //divide each value by the max value
-  for(unsigned int i = 0; i < Curvature->GetNumberOfTuples(); i++)
+  // Divide each value by the max value
+  for(vtkIdType i = 0; i < Curvature->GetNumberOfTuples(); i++)
     {
     double val = Curvature->GetValue(i);
     Curvature->SetValue(i, val/maxValue);
