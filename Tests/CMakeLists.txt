@@ -1,5 +1,10 @@
 ENABLE_TESTING()
 
+# Normal orientation to point
+ADD_EXECUTABLE(TestPointSetNormalOrientationToPoint TestPointSetNormalOrientationToPoint.cxx ${PointSetProcessingDir}/vtkPointSetNormalOrientationToPoint.cxx)
+TARGET_LINK_LIBRARIES(TestPointSetNormalOrientationToPoint ${VTK_LIBRARIES} )
+ADD_TEST(TestPointSetNormalOrientationToPoint TestPointSetNormalOrientationToPoint)
+
 # Outlier Removal
 ADD_EXECUTABLE(TestPointSetOutlierRemoval TestPointSetOutlierRemoval.cxx ${PointSetProcessingDir}/vtkPointSetOutlierRemoval.cxx)
 TARGET_LINK_LIBRARIES(TestPointSetOutlierRemoval ${VTK_LIBRARIES} )
