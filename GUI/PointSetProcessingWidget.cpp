@@ -7,6 +7,7 @@
 // VTK
 #include <vtkArrowSource.h>
 #include <vtkGlyph3D.h>
+#include <vtkHedgeHog.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkProperty.h>
@@ -68,19 +69,14 @@ void PointSetProcessingWidget::SharedConstructor()
   this->NormalsPolyData = vtkSmartPointer<vtkPolyData>::New();
 
   // Setup the arrows
-  this->ArrowSource = vtkSmartPointer<vtkArrowSource>::New();
-  this->ArrowSource->Update();
-  this->ArrowGlyphFilter = vtkSmartPointer<vtkGlyph3D>::New();
-  this->ArrowGlyphFilter->SetSource(this->ArrowSource->GetOutput());
-  this->ArrowGlyphFilter->OrientOn();
-  this->ArrowGlyphFilter->SetScaleModeToScaleByScalar();
-  this->ArrowGlyphFilter->SetScaleFactor(this->sldArrowSize->GetValue());
-  this->ArrowGlyphFilter->SetVectorModeToUseNormal();
-  this->ArrowGlyphFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
-  this->ArrowGlyphFilter->Update();
+  this->HedgeHogFilter = vtkSmartPointer<vtkHedgeHog>::New();
+  this->HedgeHogFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
+  this->HedgeHogFilter->SetVectorModeToUseNormal();
+  this->HedgeHogFilter->SetScaleFactor(this->sldArrowSize->GetValue());
+  this->HedgeHogFilter->Update();
   
   this->NormalsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  this->NormalsMapper->SetInputConnection(this->ArrowGlyphFilter->GetOutputPort());
+  this->NormalsMapper->SetInputConnection(this->HedgeHogFilter->GetOutputPort());
   this->NormalsActor = vtkSmartPointer<vtkActor>::New();
   this->NormalsActor->SetMapper(this->NormalsMapper);
   
@@ -204,7 +200,7 @@ void PointSetProcessingWidget::on_sldNeighborRadius_valueChanged(float value)
 void PointSetProcessingWidget::on_sldArrowSize_valueChanged(float value)
 {
   // std::cout << "on_sldArrowSize_valueChanged to " << value << std::endl;
-  this->ArrowGlyphFilter->SetScaleFactor(value);
-  this->ArrowGlyphFilter->Update();
+  this->HedgeHogFilter->SetScaleFactor(value);
+  this->HedgeHogFilter->Update();
   this->qvtkWidget->GetRenderWindow()->Render();
 }

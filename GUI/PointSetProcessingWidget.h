@@ -11,8 +11,7 @@
 // VTK
 #include <vtkSmartPointer.h>
 class vtkActor;
-class vtkArrowSource;
-class vtkGlyph3D;
+class vtkHedgeHog;
 class vtkPolyData;
 class vtkPolyDataMapper;
 class vtkSphereSource;
@@ -59,16 +58,15 @@ private:
   vtkSmartPointer<vtkPolyData> NormalsPolyData;
   vtkSmartPointer<vtkPolyDataMapper> NormalsMapper;
   vtkSmartPointer<vtkActor> NormalsActor;
-  vtkSmartPointer<vtkArrowSource> ArrowSource;
-  vtkSmartPointer<vtkGlyph3D> ArrowGlyphFilter;
-  
+  vtkSmartPointer<vtkHedgeHog> HedgeHogFilter;
+
   vtkSmartPointer<vtkRenderer> Renderer;
-  
+
   // This sphere indicates the radius used for the neighbor search
   vtkSmartPointer<vtkSphereSource> SphereSource;
   vtkSmartPointer<vtkPolyDataMapper> SphereMapper;
   vtkSmartPointer<vtkActor> SphereActor;
-    
+
   vtkSmartPointer<vtkPointSetNormalEstimation> NormalEstimationFilter;
   VTKComputationThread<vtkPointSetNormalEstimation>* NormalEstimationComputationObject;
   QThread* NormalEstimationThread;
