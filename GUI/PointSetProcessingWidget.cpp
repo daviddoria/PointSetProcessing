@@ -79,7 +79,8 @@ void PointSetProcessingWidget::SharedConstructor()
   this->NormalsMapper->SetInputConnection(this->HedgeHogFilter->GetOutputPort());
   this->NormalsActor = vtkSmartPointer<vtkActor>::New();
   this->NormalsActor->SetMapper(this->NormalsMapper);
-  
+  this->NormalsActor->GetProperty()->SetInterpolationToFlat();
+
   // VTK Renderer
   this->Renderer = vtkSmartPointer<vtkRenderer>::New();
   this->Renderer->AddViewProp(this->PointsActor);

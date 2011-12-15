@@ -72,18 +72,13 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
       }
     else if(this->Mode == RADIUS)
       {
-      kDTree->FindPointsWithinRadius(this->Radius, point, neighborIds);
+      float multiplier = 1.0f;
+      while(neighborIds->GetNumberOfIds() < 3) // If there are not at least 3 points (the current point gets included in the neighbors set), a plane is not defined.
+        {
+        kDTree->FindPointsWithinRadius(this->Radius * multiplier, point, neighborIds);
+        multiplier *= 2.0f;
+        }
       }
-
-    // std::cout << neighborIds->GetNumberOfIds() << " neighbors." << std::endl;
-
-//     vtkSmartPointer<vtkPoints> neighbors = vtkSmartPointer<vtkPoints>::New();
-//     for(vtkIdType p = 0; p < neighborIds->GetNumberOfIds(); p++)
-//       {
-//       double neighbor[3];
-//       input->GetPoint(neighborIds->GetId(p), neighbor);
-//       neighbors->InsertNextPoint(neighbor);
-//       }
 
     vtkSmartPointer<vtkPlane> bestPlane = vtkSmartPointer<vtkPlane>::New();
     //BestFitPlane(neighbors, bestPlane);
