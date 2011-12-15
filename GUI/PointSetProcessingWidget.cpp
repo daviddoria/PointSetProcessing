@@ -177,7 +177,7 @@ void PointSetProcessingWidget::slot_StopProgressBar()
 
 void PointSetProcessingWidget::slot_NormalEstimationComplete()
 {
-  std::cout << "Operation took: " << QTime().addMSecs(this->Timer.elapsed()).second();
+  std::cout << "Normal estimation completed in " << QTime().addMSecs(this->Timer.elapsed()).second() << " seconds.";
   // std::cout << "slot_NormalEstimationComplete()" << std::endl;
   this->NormalsPolyData->DeepCopy(this->NormalEstimationFilter->GetOutput());
   this->NormalsPolyData->Modified();

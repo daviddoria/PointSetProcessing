@@ -164,8 +164,8 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
     //vtkstd::cout << "Old normal: " << OldNormal[0] << " " << OldNormal[1] << " " << OldNormal[2] << " ";
     if(vtkMath::Dot(OldNormal, LastNormal) < 0.0) //the normal is facing the "wrong" way
     {
-      //flip the normal
-      MultiplyScalar(OldNormal, -1.0);
+      // Flip the normal
+      vtkMath::MultiplyScalar(OldNormal, -1.0);
       FlippedNormals++;
       //vtkstd::cout << "New normal: " << OldNormal[0] << " " << OldNormal[1] << " " << OldNormal[2] << " ";
     }
@@ -202,27 +202,17 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
 void vtkPointSetNormalOrientation::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "K Nearest Neighbors: " << this->KNearestNeighbors << vtkstd::endl;
-  
-}
-
-void MultiplyScalar(double a[3], const double s)
-{
-  //Multiply (in place) every element in an array by a scalar
-  for(unsigned int i = 0; i < 3; i++)
-    {
-    a[i] *= s;
-    }
+  os << indent << "K Nearest Neighbors: " << this->KNearestNeighbors << std::endl;
 }
 
 unsigned int FindMaxZId(vtkPolyData* input)
 {
   unsigned int MaxZId = 0;
-    
+
   double MaxZ = -1.0 * vtkstd::numeric_limits<double>::infinity();
-    
-    //find the highest point
-  for(unsigned int i = 0; i < input->GetNumberOfPoints(); i++)
+
+  // Find the highest point
+  for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
     {
     double p[3];
     input->GetPoint(i,p);
@@ -232,6 +222,6 @@ unsigned int FindMaxZId(vtkPolyData* input)
       MaxZ = p[2];
       }
     }
-    
+
   return MaxZId;
 }

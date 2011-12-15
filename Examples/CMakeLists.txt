@@ -2,6 +2,10 @@ ADD_EXECUTABLE(PointSetOutlierRemovalExample PointSetOutlierRemoval.cpp
 ${PointSetProcessingDir}/vtkPointSetOutlierRemoval.cxx)
 TARGET_LINK_LIBRARIES(PointSetOutlierRemovalExample ${VTK_LIBRARIES} )
 
+ADD_EXECUTABLE(PointSetNormalOrientationToPointExample PointSetNormalOrientationToPoint.cpp
+${PointSetProcessingDir}/vtkPointSetNormalOrientationToPoint.cxx)
+TARGET_LINK_LIBRARIES(PointSetNormalOrientationToPointExample ${VTK_LIBRARIES} )
+
 ADD_EXECUTABLE(PointSetCurvatureEstimationExample PointSetCurvatureEstimation.cpp
 ${PointSetProcessingDir}/vtkPointSetCurvatureEstimation.cxx)
 TARGET_LINK_LIBRARIES(PointSetCurvatureEstimationExample ${VTK_LIBRARIES} )

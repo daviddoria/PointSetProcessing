@@ -3,7 +3,7 @@
 #include "vtkXMLPolyDataReader.h"
 #include "vtkXMLPolyDataWriter.h"
 
-#include "vtkPointSetNormalOrientation.h"
+#include "vtkPointSetNormalOrientationToPoint.h"
 
 int main (int argc, char *argv[])
 {
@@ -24,9 +24,8 @@ int main (int argc, char *argv[])
   reader->Update();
 
   // Perform normal orientation
-  vtkSmartPointer<vtkPointSetNormalOrientation> normalOrientationFilter = vtkSmartPointer<vtkPointSetNormalOrientation>::New();
+  vtkSmartPointer<vtkPointSetNormalOrientationToPoint> normalOrientationFilter = vtkSmartPointer<vtkPointSetNormalOrientationToPoint>::New();
   normalOrientationFilter->SetInput(reader->GetOutput());
-  normalOrientationFilter->SetKNearestNeighbors(10);
   normalOrientationFilter->Update();
 
   // Write the new normals to a file

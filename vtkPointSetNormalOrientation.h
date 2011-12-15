@@ -1,4 +1,5 @@
-// .NAME vtkPointSetNormalOrientation - Estimate normals of a point set using a local best fit plane.
+// .NAME vtkPointSetNormalOrientation - Orient the normals of a point set
+// consistently.
 // .SECTION Description
 // This filter implements the technique described by Hoppe et al. 
 // in ``Surface reconstruction from unorganized points''. This method 
