@@ -24,43 +24,43 @@ int main (int argc, char *argv[])
     }
   
   // Parse command line arguments
-  std::string InputFilename = argv[1];
-  std::string GroundTruthFilename = argv[2];
+  std::string inputFileName = argv[1];
+  std::string groundTruthFileName = argv[2];
   
   // Read the input file
-  vtkSmartPointer<vtkXMLPolyDataReader> InputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  InputReader->SetFileName(InputFilename.c_str());
-  InputReader->Update();
+  vtkSmartPointer<vtkXMLPolyDataReader> inputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+  inputReader->SetFileName(inputFileName.c_str());
+  inputReader->Update();
   
-  vtkPolyData* InputPolyData = InputReader->GetOutput();
+  vtkPolyData* inputPolyData = inputReader->GetOutput();
   
   // Estimate normals
-  vtkSmartPointer<vtkEuclideanMinimumSpanningTree> EMSTFilter = vtkSmartPointer<vtkEuclideanMinimumSpanningTree>::New();
-  EMSTFilter->SetInput(InputReader->GetOutput());
-  EMSTFilter->Update();
+  vtkSmartPointer<vtkEuclideanMinimumSpanningTree> emstFilter = vtkSmartPointer<vtkEuclideanMinimumSpanningTree>::New();
+  emstFilter->SetInput(inputReader->GetOutput());
+  emstFilter->Update();
   
-  vtkGraph* EMST = EMSTFilter->GetOutput();
+  vtkGraph* emst = emstFilter->GetOutput();
 
   // Read the ground truth file
-  vtkSmartPointer<vtkGraphReader> GroundTruthReader = vtkSmartPointer<vtkGraphReader>::New();
-  GroundTruthReader->SetFileName(GroundTruthFilename.c_str());
-  GroundTruthReader->Update();
+  vtkSmartPointer<vtkGraphReader> groundTruthReader = vtkSmartPointer<vtkGraphReader>::New();
+  groundTruthReader->SetFileName(groundTruthFileName.c_str());
+  groundTruthReader->Update();
 
-  vtkGraph* GroundTruth = GroundTruthReader->GetOutput();
+  vtkGraph* groundTruth = groundTruthReader->GetOutput();
   
-  if(GroundTruth->GetNumberOfVertices() != EMST->GetNumberOfVertices())
+  if(groundTruth->GetNumberOfVertices() != emst->GetNumberOfVertices())
     {
     std::cout << "GroundTruth->GetNumberOfVertices() != NearestNeighborGraph->GetNumberOfVertices()" << std::endl;
-    std::cout << "ground truth: " << GroundTruth->GetNumberOfVertices() << std::endl;
-    std::cout << "nearest neighbor graph: " << EMST->GetNumberOfVertices() << std::endl;
+    std::cout << "ground truth: " << groundTruth->GetNumberOfVertices() << std::endl;
+    std::cout << "nearest neighbor graph: " << emst->GetNumberOfVertices() << std::endl;
     return EXIT_FAILURE;
     }
 
-  if(GroundTruth->GetNumberOfEdges() != EMST->GetNumberOfEdges())
+  if(groundTruth->GetNumberOfEdges() != emst->GetNumberOfEdges())
     {
     std::cout << "GroundTruth->GetNumberOfEdges() != NearestNeighborGraph->GetNumberOfEdges()" << std::endl;
-    std::cout << "ground truth: " << GroundTruth->GetNumberOfEdges() << std::endl;
-    std::cout << "nearest neighbor graph: " << EMST->GetNumberOfEdges() << std::endl;
+    std::cout << "ground truth: " << groundTruth->GetNumberOfEdges() << std::endl;
+    std::cout << "nearest neighbor graph: " << emst->GetNumberOfEdges() << std::endl;
     return EXIT_FAILURE;
     }
 

@@ -1,24 +1,27 @@
-ADD_EXECUTABLE(PointSetOutlierRemovalExample PointSetOutlierRemoval.cpp
+add_executable(PointSetOutlierRemovalExample PointSetOutlierRemoval.cpp
 ${PointSetProcessingDir}/vtkPointSetOutlierRemoval.cxx)
-TARGET_LINK_LIBRARIES(PointSetOutlierRemovalExample ${VTK_LIBRARIES} )
+target_link_libraries(PointSetOutlierRemovalExample ${VTK_LIBRARIES} )
 
-ADD_EXECUTABLE(PointSetNormalOrientationToPointExample PointSetNormalOrientationToPoint.cpp
+add_executable(PointSetNormalOrientationToPointExample PointSetNormalOrientationToPoint.cpp
 ${PointSetProcessingDir}/vtkPointSetNormalOrientationToPoint.cxx)
-TARGET_LINK_LIBRARIES(PointSetNormalOrientationToPointExample ${VTK_LIBRARIES} )
+target_link_libraries(PointSetNormalOrientationToPointExample ${VTK_LIBRARIES} )
 
-ADD_EXECUTABLE(PointSetCurvatureEstimationExample PointSetCurvatureEstimation.cpp
+add_executable(PointSetCurvatureEstimationExample PointSetCurvatureEstimation.cpp
 ${PointSetProcessingDir}/vtkPointSetCurvatureEstimation.cxx)
-TARGET_LINK_LIBRARIES(PointSetCurvatureEstimationExample ${VTK_LIBRARIES} )
+target_link_libraries(PointSetCurvatureEstimationExample ${VTK_LIBRARIES} )
 
-ADD_EXECUTABLE(PointSetNormalEstimationExample PointSetNormalEstimation.cpp
+add_executable(PointSetNormalEstimationExample PointSetNormalEstimation.cpp
 ${PointSetProcessingDir}/vtkPointSetNormalEstimation.cxx)
-TARGET_LINK_LIBRARIES(PointSetNormalEstimationExample ${VTK_LIBRARIES} )
+target_link_libraries(PointSetNormalEstimationExample ${VTK_LIBRARIES} )
 
-ADD_EXECUTABLE(PointSetNormalOrientationExample PointSetNormalOrientation.cpp
+add_executable(PointSetNormalOrientationExample PointSetNormalOrientation.cpp
 ${PointSetProcessingDir}/vtkPointSetNormalOrientation.cxx 
 ${PointSetProcessingDir}/vtkRiemannianGraphFilter.cxx 
 ${PointSetProcessingDir}/vtkEuclideanMinimumSpanningTree.cxx)
-TARGET_LINK_LIBRARIES(PointSetNormalOrientationExample ${VTK_LIBRARIES})
+target_link_libraries(PointSetNormalOrientationExample ${VTK_LIBRARIES})
 
-ADD_EXECUTABLE(GenerateData GenerateData.cpp)
-TARGET_LINK_LIBRARIES(GenerateData ${VTK_LIBRARIES})
+add_executable(GenerateData GenerateData.cpp)
+target_link_libraries(GenerateData ${VTK_LIBRARIES})
+
+add_executable(GenerateOutlierData GenerateOutlierData.cpp)
+target_link_libraries(GenerateOutlierData ${VTK_LIBRARIES})

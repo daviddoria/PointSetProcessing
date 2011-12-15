@@ -20,7 +20,7 @@ vtkStandardNewMacro(vtkPointSetCurvatureEstimation);
 
 vtkPointSetCurvatureEstimation::vtkPointSetCurvatureEstimation()
 {
-  //Set defaults.
+  // Set defaults.
   this->UseAutoRadius = true;
   this->Radius = 1.0;
 }
@@ -29,7 +29,7 @@ vtkPointSetCurvatureEstimation::vtkPointSetCurvatureEstimation()
 /*
 void vtkPointSetCurvatureEstimation::SetRadius(const double r)
 {
-  //Set the radius of the nearest neighbor sphere.
+  // Set the radius of the nearest neighbor sphere.
   this->UseAutoRadius = false;
   this->Radius = r;
   
@@ -39,10 +39,10 @@ void vtkPointSetCurvatureEstimation::SetRadius(const double r)
 
 void vtkPointSetCurvatureEstimation::SetAutoRadius(vtkPolyData* input)
 {
-  //Compute and set the radius of the nearest neighbor sphere.
+  // Compute and set the radius of the nearest neighbor sphere.
   
   vtkBoundingBox box;
-  //Construct the point set bounding box.
+  // Construct the point set bounding box.
   for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
     {
     double p[3];
@@ -50,7 +50,7 @@ void vtkPointSetCurvatureEstimation::SetAutoRadius(vtkPolyData* input)
     box.AddPoint(p);
     }
   
-  //Set the radius to a heuristic on the bounding box diagonal length.
+  // Set the radius to a heuristic on the bounding box diagonal length.
   this->Radius = .2 * box.GetDiagonalLength();
   
   this->Modified();
@@ -71,16 +71,16 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   // Compute a reasonable radius automatically if requested
-  if(UseAutoRadius)
+  if(this->UseAutoRadius)
     {
     SetAutoRadius(input);
     }
     
   // Create curvature array
-  vtkSmartPointer<vtkDoubleArray> Curvature = vtkSmartPointer<vtkDoubleArray>::New();
-  Curvature->SetNumberOfComponents( 1 );
-  Curvature->SetNumberOfTuples( input->GetNumberOfPoints() );
-  Curvature->SetName( "Curvature" );
+  vtkSmartPointer<vtkDoubleArray> curvature = vtkSmartPointer<vtkDoubleArray>::New();
+  curvature->SetNumberOfComponents( 1 );
+  curvature->SetNumberOfTuples( input->GetNumberOfPoints() );
+  curvature->SetName( "Curvature" );
   
   // Get the normals
   //vtkDoubleArray* Normals = vtkDoubleArray::SafeDownCast(input->GetPointData()->GetNormals());
@@ -94,9 +94,9 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
     }
     
   // Build a KDTree
-  vtkSmartPointer<vtkKdTreePointLocator> KDTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
-  KDTree->SetDataSet(input);
-  KDTree->BuildLocator();
+  vtkSmartPointer<vtkKdTreePointLocator> kdTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
+  kdTree->SetDataSet(input);
+  kdTree->BuildLocator();
   
   // For each point in the data, get the points
   for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
@@ -112,7 +112,7 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
     plane->SetOrigin(point);
       
     vtkSmartPointer<vtkIdList> neighborIds = vtkSmartPointer<vtkIdList>::New();
-    KDTree->FindPointsWithinRadius(this->Radius, point, neighborIds);
+    kdTree->FindPointsWithinRadius(this->Radius, point, neighborIds);
     
     // Put all the points that are within the specified radius into a vtkPoints object
     vtkSmartPointer<vtkPoints> neighbors = vtkSmartPointer<vtkPoints>::New();
@@ -123,18 +123,18 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
       neighbors->InsertNextPoint(neighbor);
       }
     
-    //compute the average distance from all of the points inside the radius to the plane
-    double TotalDistance = 0.0;
+    // Compute the average distance from all of the points inside the radius to the plane
+    double totalDistance = 0.0;
     for(vtkIdType p = 0; p < neighborIds->GetNumberOfIds(); p++)
       {
       double neighbor[3];
       input->GetPoint(neighborIds->GetId(p), neighbor);
       double dist = vtkPlane::DistanceToPlane(neighbor, plane->GetNormal(), plane->GetOrigin());
-      TotalDistance += dist;
+      totalDistance += dist;
       }
       
-    double AverageDistance = TotalDistance/static_cast<double>(neighborIds->GetNumberOfIds());
-    Curvature->SetValue(i, AverageDistance);
+    double averageDistance = totalDistance/static_cast<double>(neighborIds->GetNumberOfIds());
+    curvature->SetValue(i, averageDistance);
     }
   
   output->ShallowCopy(input);
@@ -142,9 +142,9 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
   // Normalize curvature (0,1)
   // Find max value
   double maxValue = 0.0;
-  for(vtkIdType i = 0; i < Curvature->GetNumberOfTuples(); i++)
+  for(vtkIdType i = 0; i < curvature->GetNumberOfTuples(); i++)
     {
-    double val = Curvature->GetValue(i);
+    double val = curvature->GetValue(i);
     if(val > maxValue)
       {
       maxValue = val;
@@ -152,13 +152,13 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
     }
     
   // Divide each value by the max value
-  for(vtkIdType i = 0; i < Curvature->GetNumberOfTuples(); i++)
+  for(vtkIdType i = 0; i < curvature->GetNumberOfTuples(); i++)
     {
-    double val = Curvature->GetValue(i);
-    Curvature->SetValue(i, val/maxValue);
+    double val = curvature->GetValue(i);
+    curvature->SetValue(i, val/maxValue);
     }
     
-  output->GetPointData()->AddArray(Curvature);
+  output->GetPointData()->AddArray(curvature);
   
   return 1;
 }
@@ -172,26 +172,26 @@ void vtkPointSetCurvatureEstimation::PrintSelf(ostream &os, vtkIndent indent)
   os << indent << "Use auto radius: " << this->UseAutoRadius << vtkstd::endl;
 }
 
-void ComputeCenterOfMass(vtkPoints* points, double* Center)
+void ComputeCenterOfMass(vtkPoints* points, double* center)
 {
-  Center[0] = 0.0;
-  Center[1] = 0.0;
-  Center[2] = 0.0;
+  center[0] = 0.0;
+  center[1] = 0.0;
+  center[2] = 0.0;
     
   for(vtkIdType i = 0; i < points->GetNumberOfPoints(); i++)
-  {
+    {
     double point[3];
     points->GetPoint(i, point);
     
-    Center[0] += point[0];
-    Center[1] += point[1];
-    Center[2] += point[2];
-  }
+    center[0] += point[0];
+    center[1] += point[1];
+    center[2] += point[2];
+    }
   
   double NumberOfPoints = static_cast<double>(points->GetNumberOfPoints());
-  Center[0] = Center[0]/NumberOfPoints;
-  Center[1] = Center[1]/NumberOfPoints;
-  Center[2] = Center[2]/NumberOfPoints;
+  center[0] = center[0]/NumberOfPoints;
+  center[1] = center[1]/NumberOfPoints;
+  center[2] = center[2]/NumberOfPoints;
 }
 
 /* allocate memory for an nrow x ncol matrix */

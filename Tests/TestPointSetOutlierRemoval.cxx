@@ -24,42 +24,42 @@ int main (int argc, char *argv[])
     }
   
   // Parse command line arguments
-  std::string InputFilename = argv[1];
-  std::string GroundTruthFilename = argv[2];
+  std::string inputFileName = argv[1];
+  std::string groundTruthFileName = argv[2];
   
   // Read the input file
-  vtkSmartPointer<vtkXMLPolyDataReader> InputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  InputReader->SetFileName(InputFilename.c_str());
-  InputReader->Update();
+  vtkSmartPointer<vtkXMLPolyDataReader> inputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+  inputReader->SetFileName(inputFileName.c_str());
+  inputReader->Update();
   
   // Estimate normals
-  vtkSmartPointer<vtkPointSetOutlierRemoval> OutlierRemoval = vtkSmartPointer<vtkPointSetOutlierRemoval>::New();
-  OutlierRemoval->SetInput(InputReader->GetOutput());
-  OutlierRemoval->SetPercentToRemove(.01); //remove 1% of the points
-  OutlierRemoval->Update();
+  vtkSmartPointer<vtkPointSetOutlierRemoval> outlierRemoval = vtkSmartPointer<vtkPointSetOutlierRemoval>::New();
+  outlierRemoval->SetInput(inputReader->GetOutput());
+  outlierRemoval->SetPercentToRemove(.01); //remove 1% of the points
+  outlierRemoval->Update();
   
-  vtkPolyData* OutliersRemoved = OutlierRemoval->GetOutput();
+  vtkPolyData* outliersRemoved = outlierRemoval->GetOutput();
 
   // Read the ground truth file
-  vtkSmartPointer<vtkXMLPolyDataReader> GroundTruthReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  GroundTruthReader->SetFileName(GroundTruthFilename.c_str());
-  GroundTruthReader->Update();
+  vtkSmartPointer<vtkXMLPolyDataReader> groundTruthReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+  groundTruthReader->SetFileName(groundTruthFileName.c_str());
+  groundTruthReader->Update();
 
-  vtkPolyData* GroundTruth = GroundTruthReader->GetOutput();
-  if(GroundTruth->GetNumberOfPoints() != OutliersRemoved->GetNumberOfPoints())
+  vtkPolyData* groundTruth = groundTruthReader->GetOutput();
+  if(groundTruth->GetNumberOfPoints() != outliersRemoved->GetNumberOfPoints())
     {
     std::cout << "GroundTruth->GetNumberOfPoints() != OutliersRemoved->GetNumberOfPoints()" << std::endl;
-    std::cout << "GroundTruth->GetNumberOfPoints() = " << GroundTruth->GetNumberOfPoints() << std::endl;
-    std::cout << "OutliersRemoved->GetNumberOfPoints() = " << OutliersRemoved->GetNumberOfPoints() << std::endl;
+    std::cout << "GroundTruth->GetNumberOfPoints() = " << groundTruth->GetNumberOfPoints() << std::endl;
+    std::cout << "OutliersRemoved->GetNumberOfPoints() = " << outliersRemoved->GetNumberOfPoints() << std::endl;
     return EXIT_FAILURE;
     }
 
-  for(unsigned int i = 0; i < GroundTruth->GetNumberOfPoints(); i++)
+  for(vtkIdType i = 0; i < groundTruth->GetNumberOfPoints(); i++)
     {
     double gt[3];
-    GroundTruth->GetPoints()->GetPoint(i,gt);
+    groundTruth->GetPoints()->GetPoint(i,gt);
     double n[3];
-    OutliersRemoved->GetPoints()->GetPoint(i,n);
+    outliersRemoved->GetPoints()->GetPoint(i,n);
     for(unsigned int p = 0; p < 3; p++)
       {
       if(!fuzzyCompare(gt[p], n[p]))

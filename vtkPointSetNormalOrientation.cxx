@@ -46,14 +46,14 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
                                              vtkInformationVector **inputVector,
                                              vtkInformationVector *outputVector)
 {
-  //This function calls the scanners input and output to allow it to 
-  //work in the vtk algorithm pipeline
+  // This function calls the scanners input and output to allow it to 
+  // work in the vtk algorithm pipeline
   
-  // get the info objects
+  // Get the info objects
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  // get the input and ouptut
+  // Get the input and ouptut
   vtkPolyData *input = vtkPolyData::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkPolyData *output = vtkPolyData::SafeDownCast(
@@ -65,11 +65,11 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   NearestNeighborGraphFilter->SetkNeighbors(this->KNearestNeighbors);
   NearestNeighborGraphFilter->Update();
   */
-  vtkSmartPointer<vtkRiemannianGraphFilter> RiemannianGraphFilter = vtkSmartPointer<vtkRiemannianGraphFilter>::New();
-  RiemannianGraphFilter->SetInput(input);
-  RiemannianGraphFilter->Update();
+  vtkSmartPointer<vtkRiemannianGraphFilter> riemannianGraphFilter = vtkSmartPointer<vtkRiemannianGraphFilter>::New();
+  riemannianGraphFilter->SetInput(input);
+  riemannianGraphFilter->Update();
   
-  vtkUndirectedGraph* RiemannianGraph = vtkUndirectedGraph::SafeDownCast(RiemannianGraphFilter->GetOutput());
+  vtkUndirectedGraph* riemannianGraph = vtkUndirectedGraph::SafeDownCast(riemannianGraphFilter->GetOutput());
   
 
   /*
@@ -82,26 +82,26 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   GraphLayoutView->GetInteractor()->Start();
   */
    
-  //find the top point to act as the seed for the normal propagation
-  unsigned int MaxZId = FindMaxZId(input);
-  vtkstd::cout << "MaxZId: " << MaxZId << vtkstd::endl;
+  // Find the top point to act as the seed for the normal propagation
+  unsigned int maxZId = FindMaxZId(input);
+  std::cout << "MaxZId: " << maxZId << std::endl;
   
-  //create the edge weight array
-  vtkSmartPointer<vtkDoubleArray> Weights = vtkSmartPointer<vtkDoubleArray>::New();
-  Weights->SetNumberOfComponents(1);
-  Weights->SetName("Weights");
+  // Create the edge weight array
+  vtkSmartPointer<vtkDoubleArray> weights = vtkSmartPointer<vtkDoubleArray>::New();
+  weights->SetNumberOfComponents(1);
+  weights->SetName("Weights");
    
-  //reweight edges
-  vtkSmartPointer<vtkEdgeListIterator> EdgeListIterator = vtkSmartPointer<vtkEdgeListIterator>::New();
-  RiemannianGraph->GetEdges(EdgeListIterator);
-  while(EdgeListIterator->HasNext())
+  // Reweight edges
+  vtkSmartPointer<vtkEdgeListIterator> edgeListIterator = vtkSmartPointer<vtkEdgeListIterator>::New();
+  riemannianGraph->GetEdges(edgeListIterator);
+  while(edgeListIterator->HasNext())
   {
-    vtkEdgeType Edge = EdgeListIterator->Next();
+    vtkEdgeType Edge = edgeListIterator->Next();
     //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << vtkstd::endl;
     double source[3];
     double target[3];
-    RiemannianGraph->GetPoints()->GetPoint(Edge.Source, source);
-    RiemannianGraph->GetPoints()->GetPoint(Edge.Target, target);
+    riemannianGraph->GetPoints()->GetPoint(Edge.Source, source);
+    riemannianGraph->GetPoints()->GetPoint(Edge.Target, target);
     
     //double w = vtkMath::Dot(source, target);
     double w = 1.0 - fabs(vtkMath::Dot(source, target));
@@ -109,24 +109,24 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
     
     //naive
     //double w = 1.0;
-    Weights->InsertNextValue(w);
+    weights->InsertNextValue(w);
   }
   
-  //add the edge weight array to the graph
-  RiemannianGraph->GetEdgeData()->AddArray(Weights);
+  // Add the edge weight array to the graph
+  riemannianGraph->GetEdgeData()->AddArray(weights);
   
-  //vtkstd::cout << "Number of Weights: " << vtkDoubleArray::SafeDownCast(PointGraph->GetEdgeData()->GetArray("Weights"))->GetNumberOfTuples() << vtkstd::endl;
+  // std::cout << "Number of Weights: " << vtkDoubleArray::SafeDownCast(PointGraph->GetEdgeData()->GetArray("Weights"))->GetNumberOfTuples() << vtkstd::endl;
   
-  //find the minimum spanning tree on the Riemannian graph, starting from the highest point
-  vtkSmartPointer<vtkBoostPrimMinimumSpanningTree> MSTFilter = vtkSmartPointer<vtkBoostPrimMinimumSpanningTree>::New();
-  MSTFilter->SetOriginVertex(MaxZId);
-  MSTFilter->SetInput(RiemannianGraph);
-  MSTFilter->SetEdgeWeightArrayName("Weights");
-  MSTFilter->Update();
+  // Find the minimum spanning tree on the Riemannian graph, starting from the highest point
+  vtkSmartPointer<vtkBoostPrimMinimumSpanningTree> mstFilter = vtkSmartPointer<vtkBoostPrimMinimumSpanningTree>::New();
+  mstFilter->SetOriginVertex(maxZId);
+  mstFilter->SetInput(riemannianGraph);
+  mstFilter->SetEdgeWeightArrayName("Weights");
+  mstFilter->Update();
   
-  //get the output tree
-  vtkSmartPointer<vtkTree> MST = vtkSmartPointer<vtkTree>::New();
-  MST->ShallowCopy(MSTFilter->GetOutput());
+  // Get the output tree
+  vtkSmartPointer<vtkTree> mst = vtkSmartPointer<vtkTree>::New();
+  mst->ShallowCopy(mstFilter->GetOutput());
   
 /*
   vtkSmartPointer<vtkGraphLayoutView> MSTView = vtkSmartPointer<vtkGraphLayoutView>::New();
@@ -138,52 +138,52 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   */
 
   //traverse the minimum spanning tree to propagate the normal direction
-  vtkSmartPointer<vtkTreeDFSIterator> DFS = vtkSmartPointer<vtkTreeDFSIterator>::New();
-  DFS->SetStartVertex(MaxZId);
-  DFS->SetTree(MST);
+  vtkSmartPointer<vtkTreeDFSIterator> dfsIterator = vtkSmartPointer<vtkTreeDFSIterator>::New();
+  dfsIterator->SetStartVertex(maxZId);
+  dfsIterator->SetTree(mst);
   
-  vtkDoubleArray* OldNormals = vtkDoubleArray::SafeDownCast(input->GetPointData()->GetNormals());
+  vtkDoubleArray* oldNormals = vtkDoubleArray::SafeDownCast(input->GetPointData()->GetNormals());
 
-  vtkSmartPointer<vtkDoubleArray> NewNormals = vtkSmartPointer<vtkDoubleArray>::New();
-  NewNormals->SetName("Normals");
-  NewNormals->SetNumberOfComponents(3); //3d normals (ie x,y,z)
-  NewNormals->SetNumberOfTuples(input->GetNumberOfPoints());
+  vtkSmartPointer<vtkDoubleArray> newNormals = vtkSmartPointer<vtkDoubleArray>::New();
+  newNormals->SetName("Normals");
+  newNormals->SetNumberOfComponents(3); //3d normals (ie x,y,z)
+  newNormals->SetNumberOfTuples(input->GetNumberOfPoints());
       
-  //traverse the tree (depth first) and flip normals if necessary
-  double LastNormal[3] = {0.0,0.0,1.0}; //The first normal should be facing (out). Since we used the point with the max z coordinate as the root of this traversal tree, we should check it's normal against the "up" (+z) vector
-  unsigned int NodesVisited = 0;
-  unsigned int FlippedNormals = 0;
-  while(DFS->HasNext())
-  {
-    NodesVisited++;
-    vtkIdType NextVertex = DFS->Next();
-    //vtkstd::cout << "Next vertex: " << NextVertex << vtkstd::endl;
-    double OldNormal[3];
-    
-    OldNormals->GetTuple(NextVertex, OldNormal);
-    //vtkstd::cout << "Old normal: " << OldNormal[0] << " " << OldNormal[1] << " " << OldNormal[2] << " ";
-    if(vtkMath::Dot(OldNormal, LastNormal) < 0.0) //the normal is facing the "wrong" way
+  // Traverse the tree (depth first) and flip normals if necessary
+  double lastNormal[3] = {0.0,0.0,1.0}; //The first normal should be facing (out). Since we used the point with the max z coordinate as the root of this traversal tree, we should check it's normal against the "up" (+z) vector
+  unsigned int nodesVisited = 0;
+  unsigned int flippedNormals = 0;
+  while(dfsIterator->HasNext())
     {
+    nodesVisited++;
+    vtkIdType nextVertex = dfsIterator->Next();
+    //vtkstd::cout << "Next vertex: " << NextVertex << vtkstd::endl;
+    double oldNormal[3];
+    
+    oldNormals->GetTuple(nextVertex, oldNormal);
+    //std::cout << "Old normal: " << OldNormal[0] << " " << OldNormal[1] << " " << OldNormal[2] << " ";
+    if(vtkMath::Dot(oldNormal, lastNormal) < 0.0) //the normal is facing the "wrong" way
+      {
       // Flip the normal
-      vtkMath::MultiplyScalar(OldNormal, -1.0);
-      FlippedNormals++;
-      //vtkstd::cout << "New normal: " << OldNormal[0] << " " << OldNormal[1] << " " << OldNormal[2] << " ";
+      vtkMath::MultiplyScalar(oldNormal, -1.0);
+      flippedNormals++;
+      //std::cout << "New normal: " << OldNormal[0] << " " << OldNormal[1] << " " << OldNormal[2] << " ";
+      }
+    
+    // std::cout << std::endl;
+    newNormals->SetTuple(nextVertex, oldNormal);
+    
+    lastNormal[0] = oldNormal[0];
+    lastNormal[1] = oldNormal[1];
+    lastNormal[2] = oldNormal[2];
     }
-    
-    //vtkstd::cout << vtkstd::endl;
-    NewNormals->SetTuple(NextVertex, OldNormal);
-    
-    LastNormal[0] = OldNormal[0];
-    LastNormal[1] = OldNormal[1];
-    LastNormal[2] = OldNormal[2];
-  }
   
-  //vtkstd::cout << "Nodes visited: " << NodesVisited << vtkstd::endl;
-  //vtkstd::cout << "Total nodes: " << MinimumSpanningTree->GetNumberOfVertices() << vtkstd::endl;
-  vtkstd::cout << "Flipped normals: " << FlippedNormals << vtkstd::endl;
+  //std::cout << "Nodes visited: " << NodesVisited << std::endl;
+  //std::cout << "Total nodes: " << MinimumSpanningTree->GetNumberOfVertices() << std::endl;
+  std::cout << "Flipped normals: " << flippedNormals << vtkstd::endl;
   
   output->ShallowCopy(input);
-  output->GetPointData()->SetNormals(NewNormals);
+  output->GetPointData()->SetNormals(newNormals);
   /*
   vtkSmartPointer<vtkPolyData> OutputPolydata = vtkSmartPointer<vtkPolyData>::New();
   OutputPolydata->ShallowCopy(input);

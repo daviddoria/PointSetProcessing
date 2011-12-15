@@ -48,11 +48,11 @@ int vtkRiemannianGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
                                          vtkInformationVector **inputVector,
                                          vtkInformationVector *outputVector)
 {
-  // get the info objects
+  // Get the info objects
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
-  // get the input and ouptut
+  // Get the input and ouptut
   //vtkDataSet* input = vtkDataSet::SafeDownCast(
       ///inInfo->Get(vtkDataObject::DATA_OBJECT()));
   
@@ -63,11 +63,11 @@ int vtkRiemannianGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
   vtkGraph *output = vtkGraph::SafeDownCast(
                                             outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  vtkSmartPointer<vtkEuclideanMinimumSpanningTree> EMSTFilter = vtkSmartPointer<vtkEuclideanMinimumSpanningTree>::New();
-  EMSTFilter->SetInput(input);
-  EMSTFilter->Update();
+  vtkSmartPointer<vtkEuclideanMinimumSpanningTree> emstFilter = vtkSmartPointer<vtkEuclideanMinimumSpanningTree>::New();
+  emstFilter->SetInput(input);
+  emstFilter->Update();
   
-  vtkTree* EMST = EMSTFilter->GetOutput();
+  vtkTree* emst = emstFilter->GetOutput();
   
   //copy EMST into a mutable graph
   /*
@@ -76,73 +76,73 @@ int vtkRiemannianGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
   NearestNeighborGraph->ShallowCopy(NearestNeighborGraphFilter->GetOutput());
   */
 
-  vtkSmartPointer<vtkMutableUndirectedGraph> G = vtkSmartPointer<vtkMutableUndirectedGraph>::New();
+  vtkSmartPointer<vtkMutableUndirectedGraph> g = vtkSmartPointer<vtkMutableUndirectedGraph>::New();
   
-  TreeToUndirectedGraph(EMST,G);
+  TreeToUndirectedGraph(emst, g);
  
-  vtkstd::cout << "G NumVertices: " << G->GetNumberOfVertices() << vtkstd::endl;
+  std::cout << "G NumVertices: " << g->GetNumberOfVertices() << vtkstd::endl;
   
-  //create a KDTree of the points
-  vtkSmartPointer<vtkKdTreePointLocator> KDTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
-  KDTree->SetDataSet(input);
-  KDTree->BuildLocator();
+  // Create a KDTree of the points
+  vtkSmartPointer<vtkKdTreePointLocator> kdTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
+  kdTree->SetDataSet(input);
+  kdTree->BuildLocator();
     
-  //create the new edge weight array
-  vtkSmartPointer<vtkDoubleArray> Weights = vtkSmartPointer<vtkDoubleArray>::New();
-  Weights->SetNumberOfComponents(1);
-  Weights->SetName("Weights");
+  // Create the new edge weight array
+  vtkSmartPointer<vtkDoubleArray> weights = vtkSmartPointer<vtkDoubleArray>::New();
+  weights->SetNumberOfComponents(1);
+  weights->SetName("Weights");
     
-  //find the nearest neighbors to each point and add adges between them, if they do not already exist and they are not self loops
-  for(unsigned int pointID = 0; pointID < input->GetNumberOfPoints(); pointID++)
-  {
-    //vtkstd::cout << "pointID: " << pointID << vtkstd::endl;
+  // Find the nearest neighbors to each point and add adges between them, if they do not already exist and they are not self loops
+  for(vtkIdType pointID = 0; pointID < input->GetNumberOfPoints(); pointID++)
+    {
+    // std::cout << "pointID: " << pointID << std::endl;
     
     double point[3];
     input->GetPoint(pointID, point);
     vtkSmartPointer<vtkIdList> result = vtkSmartPointer<vtkIdList>::New();
   
-    KDTree->FindClosestNPoints(this->kNeighbors + 1, point, result);
-  
-    for(int neighbor = 1; neighbor < this->kNeighbors + 1; neighbor++) //start at 1 and go to (kNeighbors+1) so we don't include the exact same point and still use n neighbors
-    {
-      unsigned int neighborID = result->GetId(neighbor);
+    kdTree->FindClosestNPoints(this->kNeighbors + 1, point, result);
+
+    // Start at 1 and go to (kNeighbors+1) so we don't include the exact same point and still use n neighbors
+    for(unsigned int neighbor = 1; neighbor < this->kNeighbors + 1; neighbor++)
+      {
+      vtkIdType neighborID = result->GetId(neighbor);
       //vtkstd::cout << "neighborID: " << neighborID << vtkstd::endl;
       vtkSmartPointer<vtkAdjacentVertexIterator> iterator = vtkSmartPointer<vtkAdjacentVertexIterator>::New();
-      G->GetAdjacentVertices(pointID, iterator);
+      g->GetAdjacentVertices(pointID, iterator);
       bool EdgeAlreadyExists = false;
       while(iterator->HasNext())
-      {
-        if(iterator->Next() == neighborID)
         {
+        if(iterator->Next() == neighborID)
+          {
           EdgeAlreadyExists = true;
           break;
+          }
+        }
+      if(!EdgeAlreadyExists && (pointID != neighborID))
+        {
+        g->AddEdge(pointID, neighborID);
         }
       }
-      if(!EdgeAlreadyExists && (pointID != neighborID))
-      {
-        G->AddEdge(pointID, neighborID);
-      }
     }
-  }
   
-  //add the point coordinates to the graph
-  G->SetPoints(input->GetPoints());
+  // Add the point coordinates to the graph
+  g->SetPoints(input->GetPoints());
   
-  output->ShallowCopy(G);
+  output->ShallowCopy(g);
   
   return 1;
 }
 
 int vtkRiemannianGraphFilter::FillInputPortInformation( int port, vtkInformation* info )
 {
-
-  //The input should be a vtkDataSet
+  // The input should be a vtkDataSet
   if (port == 0)
-  {
+    {
     //info->Set( vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet" );
     info->Set( vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkPolyData" );
     return 1;
-  }
+    }
 
   return 0;
 }
@@ -152,25 +152,24 @@ void vtkRiemannianGraphFilter::PrintSelf(ostream &os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   
   os << indent << "kneighbors: " << this->kNeighbors << vtkstd::endl;
-  
 }
 
-void TreeToUndirectedGraph(vtkTree* Tree, vtkMutableUndirectedGraph* UndirectedGraph)
+void TreeToUndirectedGraph(vtkTree* tree, vtkMutableUndirectedGraph* undirectedGraph)
 {
-//add vertices to MUG
-  for(unsigned int i = 0; i < Tree->GetNumberOfVertices(); i++)
-  {
-    UndirectedGraph->AddVertex();
-  }
+  // Add vertices to MUG
+  for(vtkIdType i = 0; i < tree->GetNumberOfVertices(); i++)
+    {
+    undirectedGraph->AddVertex();
+    }
     
-  vtkSmartPointer<vtkEdgeListIterator> EdgeIterator = vtkSmartPointer<vtkEdgeListIterator>::New();
-  Tree->GetEdges(EdgeIterator);
-  while(EdgeIterator->HasNext())
+  vtkSmartPointer<vtkEdgeListIterator> edgeIterator = vtkSmartPointer<vtkEdgeListIterator>::New();
+  tree->GetEdges(edgeIterator);
+  while(edgeIterator->HasNext())
   {
-    vtkEdgeType Edge = EdgeIterator->Next();
+    vtkEdgeType edge = edgeIterator->Next();
     //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << vtkstd::endl;
-    UndirectedGraph->AddEdge(Edge.Source, Edge.Target);
+    undirectedGraph->AddEdge(edge.Source, edge.Target);
   }
   
-  UndirectedGraph->SetPoints(Tree->GetPoints());
+  undirectedGraph->SetPoints(tree->GetPoints());
 }

@@ -27,60 +27,60 @@ int main (int argc, char *argv[])
     }
   
   // Parse command line arguments
-  std::string InputFilename = argv[1];
-  std::string GroundTruthFilename = argv[2];
+  std::string inputFileName = argv[1];
+  std::string groundTruthFileName = argv[2];
   
   // Read the input file
-  vtkSmartPointer<vtkXMLPolyDataReader> InputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  InputReader->SetFileName(InputFilename.c_str());
-  InputReader->Update();
+  vtkSmartPointer<vtkXMLPolyDataReader> inputReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+  inputReader->SetFileName(inputFileName.c_str());
+  inputReader->Update();
 
   // Estimate normals
-  vtkSmartPointer<vtkPointSetNormalOrientation> NormalOrientation = vtkSmartPointer<vtkPointSetNormalOrientation>::New();
-  NormalOrientation->SetInput(InputReader->GetOutput());
-  NormalOrientation->Update();
+  vtkSmartPointer<vtkPointSetNormalOrientation> normalOrientation = vtkSmartPointer<vtkPointSetNormalOrientation>::New();
+  normalOrientation->SetInput(inputReader->GetOutput());
+  normalOrientation->Update();
   
-  vtkPolyData* OrientedNormalsPolyData = NormalOrientation->GetOutput();
+  vtkPolyData* orientedNormalsPolyData = normalOrientation->GetOutput();
 
   // Read the ground truth file
-  vtkSmartPointer<vtkXMLPolyDataReader> GroundTruthReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
-  GroundTruthReader->SetFileName(GroundTruthFilename.c_str());
-  GroundTruthReader->Update();
+  vtkSmartPointer<vtkXMLPolyDataReader> groundTruthReader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
+  groundTruthReader->SetFileName(groundTruthFileName.c_str());
+  groundTruthReader->Update();
 
-  vtkPolyData* GroundTruthPolyData = GroundTruthReader->GetOutput();
+  vtkPolyData* groundTruthPolyData = groundTruthReader->GetOutput();
   
-  if(GroundTruthPolyData->GetNumberOfPoints() != OrientedNormalsPolyData->GetNumberOfPoints())
+  if(groundTruthPolyData->GetNumberOfPoints() != orientedNormalsPolyData->GetNumberOfPoints())
     {
     std::cout << "Number of points do not match!" << std::endl;
-    std::cout << "Ground truth points: " << GroundTruthPolyData->GetNumberOfPoints() << std::endl;
-    std::cout << "Input points: " << OrientedNormalsPolyData->GetNumberOfPoints() << std::endl;
+    std::cout << "Ground truth points: " << groundTruthPolyData->GetNumberOfPoints() << std::endl;
+    std::cout << "Input points: " << orientedNormalsPolyData->GetNumberOfPoints() << std::endl;
     return EXIT_FAILURE;
     }
 
   // Get both sets of normals
-  vtkSmartPointer<vtkDoubleArray> GroundTruthNormals = 
-    vtkDoubleArray::SafeDownCast(GroundTruthPolyData->GetPointData()->GetNormals());
-  vtkSmartPointer<vtkDoubleArray> OrientedNormals =
-    vtkDoubleArray::SafeDownCast(OrientedNormalsPolyData->GetPointData()->GetNormals());
+  vtkSmartPointer<vtkDoubleArray> groundTruthNormals =
+    vtkDoubleArray::SafeDownCast(groundTruthPolyData->GetPointData()->GetNormals());
+  vtkSmartPointer<vtkDoubleArray> orientedNormals =
+    vtkDoubleArray::SafeDownCast(orientedNormalsPolyData->GetPointData()->GetNormals());
 
-  for(unsigned int i = 0; i < GroundTruthPolyData->GetNumberOfPoints(); i++)
-  {
+  for(vtkIdType i = 0; i < groundTruthPolyData->GetNumberOfPoints(); i++)
+    {
     double gt[3];
     double est[3];
-    OrientedNormals->GetTuple(i, est);
-    GroundTruthNormals->GetTuple(i, gt);
+    orientedNormals->GetTuple(i, est);
+    groundTruthNormals->GetTuple(i, gt);
   
     for(unsigned int p = 0; p < 3; p++)
-    {
-      if(!fuzzyCompare(gt[p], est[p]))
       {
+      if(!fuzzyCompare(gt[p], est[p]))
+        {
         std::cout << "!fuzzyCompare(gt[p], est[p]))" << std::endl;
         std::cout << "gt: " << gt[p] << std::endl;
         std::cout << "est: " << est[p] << std::endl;
         return EXIT_FAILURE;
+        }
       }
-    }
-  }  
+    }  
 
   return EXIT_SUCCESS;
 }

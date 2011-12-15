@@ -22,7 +22,6 @@ vtkPointSetNormalOrientationToPoint::vtkPointSetNormalOrientationToPoint()
   this->OrientationPoint[2] = 0.0d;
 }
 
-
 int vtkPointSetNormalOrientationToPoint::RequestData(vtkInformation *vtkNotUsed(request),
                                              vtkInformationVector **inputVector,
                                              vtkInformationVector *outputVector)
@@ -35,6 +34,8 @@ int vtkPointSetNormalOrientationToPoint::RequestData(vtkInformation *vtkNotUsed(
   vtkPolyData *input = vtkPolyData::SafeDownCast(inInfo->Get(vtkDataObject::DATA_OBJECT()));
   vtkPolyData *output = vtkPolyData::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
+  std::cout << "Orienting to point " << this->OrientationPoint[0] << " " << this->OrientationPoint[1] << " " << this->OrientationPoint[2] << std::endl;
+  
   vtkFloatArray* oldNormals = vtkFloatArray::SafeDownCast(input->GetPointData()->GetNormals());
 
   vtkSmartPointer<vtkFloatArray> orientedNormals = vtkSmartPointer<vtkFloatArray>::New();
@@ -49,10 +50,10 @@ int vtkPointSetNormalOrientationToPoint::RequestData(vtkInformation *vtkNotUsed(
     double p[3];
     input->GetPoint(pointId, p);
     // Construct the vector between the point and the OrientationPoint
-    double vectorToOrientationPoint[3] = {this->OrientationPoint[0] - p[0], this->OrientationPoint[1] - p[1], this->OrientationPoint[2] - p[2]};
+    float vectorToOrientationPoint[3] = {this->OrientationPoint[0] - p[0], this->OrientationPoint[1] - p[1], this->OrientationPoint[2] - p[2]};
 
-    double oldNormal[3];
-    oldNormals->GetTuple(pointId, oldNormal);
+    float oldNormal[3];
+    oldNormals->GetTupleValue(pointId, oldNormal);
 
     // std::cout << "Old normal: " << OldNormal[0] << " " << OldNormal[1] << " " << OldNormal[2] << " ";
     if(vtkMath::Dot(oldNormal, vectorToOrientationPoint) < 0.0) // The normal is facing the "wrong" way.
@@ -61,10 +62,12 @@ int vtkPointSetNormalOrientationToPoint::RequestData(vtkInformation *vtkNotUsed(
       vtkMath::MultiplyScalar(oldNormal, -1.0f);
       }
 
-    orientedNormals->SetTuple(pointId, oldNormal);
+    //orientedNormals->SetTuple(pointId, oldNormal);
+    orientedNormals->SetTupleValue(pointId, oldNormal);
     }
 
-  output->ShallowCopy(input);
+  //output->ShallowCopy(input);
+  output->DeepCopy(input);
   output->GetPointData()->SetNormals(orientedNormals);
   return 1;
 }

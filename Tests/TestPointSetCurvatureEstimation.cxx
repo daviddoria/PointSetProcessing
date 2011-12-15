@@ -27,8 +27,8 @@ int main (int argc, char *argv[])
     }
   
   // Parse command line arguments
-  vtkstd::string inputFilename = argv[1];
-  vtkstd::string groundTruthFilename = argv[2];
+  std::string inputFilename = argv[1];
+  std::string groundTruthFilename = argv[2];
   
   // Read the input file
   vtkSmartPointer<vtkXMLPolyDataReader> inputReader = 
@@ -77,7 +77,7 @@ int main (int argc, char *argv[])
   vtkDoubleArray* estimatedCurvature = 
     vtkDoubleArray::SafeDownCast ( curvatureEstimate->GetPointData()->GetArray ( "Curvature" ) );
   
-  for(unsigned int i = 0; i < groundTruth->GetNumberOfPoints(); i++)
+  for(vtkIdType i = 0; i < groundTruth->GetNumberOfPoints(); i++)
     {
     double gc = groundTruthCurvature->GetValue ( i );
     double ec = estimatedCurvature->GetValue(i);

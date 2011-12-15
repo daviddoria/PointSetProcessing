@@ -39,29 +39,29 @@ int vtkPointSetOutlierRemoval::RequestData(vtkInformation *vtkNotUsed(request),
                                  vtkInformationVector *outputVector)
 {
   
-  // get the info object
+  // Get the info object
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
   
-  // get the ouptut
+  // Get the ouptut
   vtkPolyData *output = vtkPolyData::SafeDownCast(
 		  outInfo->Get(vtkDataObject::DATA_OBJECT()));
   
   vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
-    // get the input and ouptut
+  // Get the input and ouptut
   vtkPolyData *input = vtkPolyData::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
   
-  //Create the tree
-  vtkSmartPointer<vtkKdTreePointLocator> KDTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
-  KDTree->SetDataSet(input);
-  KDTree->BuildLocator();
+  // Create the tree
+  vtkSmartPointer<vtkKdTreePointLocator> kdTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
+  kdTree->SetDataSet(input);
+  kdTree->BuildLocator();
   
-  vtkstd::vector<double> Distances(input->GetNumberOfPoints());
+  std::vector<double> distances(input->GetNumberOfPoints());
   
-  for(unsigned int i = 0; i < input->GetNumberOfPoints(); i++)
-  {
-    double QueryPoint[3];
-    input->GetPoint(i,QueryPoint);
+  for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
+    {
+    double queryPoint[3];
+    input->GetPoint(i, queryPoint);
     
     /* can't do this - it will find exactly the same point
     vtkIdType ID = KDTree->FindClosestPoint(QueryPoint);
@@ -71,43 +71,42 @@ int vtkPointSetOutlierRemoval::RequestData(vtkInformation *vtkNotUsed(request),
     
     // Find the 2 closest points to (0,0,0)
     vtkSmartPointer<vtkIdList> Result = vtkSmartPointer<vtkIdList>::New();
-    KDTree->FindClosestNPoints(2, QueryPoint, Result);
+    kdTree->FindClosestNPoints(2, queryPoint, Result);
   
     int point_ind = static_cast<int>(Result->GetId(1));
     double ClosestPoint[3];
     input->GetPoint(point_ind, ClosestPoint);
     
-    double ClosestPointDistance = vtkMath::Distance2BetweenPoints(QueryPoint, ClosestPoint);
-    Distances[i] = ClosestPointDistance;
-
-  }
+    double ClosestPointDistance = vtkMath::Distance2BetweenPoints(queryPoint, ClosestPoint);
+    distances[i] = ClosestPointDistance;
+    }
   
   // Compute points to be added
-  std::vector<unsigned int> Indices = ParallelSortIndices(Distances);
+  std::vector<unsigned int> Indices = ParallelSortIndices(distances);
   
-  unsigned int NumberToKeep = static_cast<unsigned int>((1-this->PercentToRemove) * input->GetNumberOfPoints());
+  unsigned int numberToKeep = static_cast<unsigned int>((1-this->PercentToRemove) * input->GetNumberOfPoints());
   //std::cout << "Number of input points: " << input->GetNumberOfPoints() << std::endl;
   //std::cout << "Percent to remove: " << this->PercentToRemove << std::endl;
   //std::cout << "Number of points to keep: " << NumberToKeep << std::endl;
   
   //add the points that should be kept to a new polydata
-  vtkSmartPointer<vtkPoints> OutputPoints = vtkSmartPointer<vtkPoints>::New();
-  vtkSmartPointer<vtkCellArray> OutputVertices = vtkSmartPointer<vtkCellArray>::New();
-  for(unsigned int i = 0; i < NumberToKeep; i++)
+  vtkSmartPointer<vtkPoints> outputPoints = vtkSmartPointer<vtkPoints>::New();
+  vtkSmartPointer<vtkCellArray> outputVertices = vtkSmartPointer<vtkCellArray>::New();
+  for(unsigned int i = 0; i < numberToKeep; i++)
   {
     //std::cout << "Dist: " << Distances[Indices[i]] << std::endl;
     double p[3];
     input->GetPoint(Indices[i], p);
     vtkIdType pid[1];
-    pid[0] = OutputPoints->InsertNextPoint(p); 
-    OutputVertices->InsertNextCell ( 1, pid );
+    pid[0] = outputPoints->InsertNextPoint(p);
+    outputVertices->InsertNextCell ( 1, pid );
   }
 
   //std::cout << "Number of points kept: " << OutputPoints->GetNumberOfPoints() << std::endl;
   
   vtkSmartPointer<vtkPolyData> OutputPolydata = vtkSmartPointer<vtkPolyData>::New();
-  OutputPolydata->SetPoints(OutputPoints);
-  OutputPolydata->SetVerts(OutputVertices);
+  OutputPolydata->SetPoints(outputPoints);
+  OutputPolydata->SetVerts(outputVertices);
   //std::cout << "Number of points kept: " << OutputPolydata->GetNumberOfPoints() << std::endl;
   
   output->ShallowCopy(OutputPolydata);
