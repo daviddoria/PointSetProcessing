@@ -33,6 +33,9 @@ class vtkPointSetNormalOrientation : public vtkPolyDataAlgorithm
     vtkSetMacro(KNearestNeighbors, unsigned int);
     vtkGetMacro(KNearestNeighbors, unsigned int);
 
+    int IterateEvent;
+    int ProgressEvent;
+
   protected:
     vtkPointSetNormalOrientation();
     ~vtkPointSetNormalOrientation(){}

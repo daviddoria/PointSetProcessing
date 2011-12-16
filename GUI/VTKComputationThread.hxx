@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <vtkPolyData.h>
+
 template<typename TFilter>
 VTKComputationThread<TFilter>::VTKComputationThread()
 {
@@ -34,7 +36,10 @@ void VTKComputationThread<TFilter>::SetFilter(TFilter* filter)
 template<typename TFilter>
 void VTKComputationThread<TFilter>::IterateCallbackFunction(vtkObject* caller, long unsigned int eventId, void* callData)
 {
-  //std::cout << "Caught event." << std::endl;
   int currentPoint = static_cast<int*>(callData)[0];
-  emit progressUpdate(currentPoint);
+  //std::cout << "Emitting " << currentPoint << " from IterateCallbackFunction." << std::endl;
+  if(currentPoint % 10 == 0 || currentPoint == vtkPolyData::SafeDownCast(this->Filter->GetInput())->GetNumberOfPoints() - 1)
+    {
+    emit progressUpdate(currentPoint);
+    }
 }

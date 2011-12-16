@@ -19,6 +19,7 @@
 
 // Custom
 #include "vtkPointSetNormalEstimation.h"
+#include "vtkPointSetNormalOrientation.h"
 #include "vtkPointSetNormalOrientationToPoint.h"
 
 PointSetProcessingWidget::PointSetProcessingWidget(QMainWindow *parent)
@@ -34,7 +35,11 @@ PointSetProcessingWidget::PointSetProcessingWidget(const std::string& fileName)
 
 void PointSetProcessingWidget::slot_ProgressUpdate(int value)
 {
-  //this->statusBar()->showMessage("Computing normal for point " + QString::number(value));
+//   if(value % 10 == 0)
+//     {
+//     this->statusBar()->showMessage("Computing normal for point " + QString::number(value));
+//     }
+  //std::cout << "value: " << value << std::endl;
   this->ProgressDialog->setValue(value);
 }
 
@@ -119,7 +124,16 @@ void PointSetProcessingWidget::on_btnGenerateNormals_clicked()
 
 void PointSetProcessingWidget::on_btnOrientNormals_clicked()
 {
+  // Perform normal orientation
+  vtkSmartPointer<vtkPointSetNormalOrientation> normalOrientationFilter = vtkSmartPointer<vtkPointSetNormalOrientation>::New();
+  normalOrientationFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
+  normalOrientationFilter->SetKNearestNeighbors(10);
+  normalOrientationFilter->Update();
+  
+  this->NormalsPolyData->DeepCopy(normalOrientationFilter->GetOutput());
+  this->NormalsPolyData->Modified();
 
+  this->qvtkWidget->GetRenderWindow()->Render();
 }
 
 void PointSetProcessingWidget::on_actionOpenFile_activated()
@@ -178,7 +192,7 @@ void PointSetProcessingWidget::slot_StopProgressBar()
 
 void PointSetProcessingWidget::slot_NormalEstimationComplete()
 {
-  std::cout << "Normal estimation completed in " << QTime().addMSecs(this->Timer.elapsed()).second() << " seconds.";
+  std::cout << "Normal estimation completed in " << QTime().addMSecs(this->Timer.elapsed()).second() << " seconds." << std::endl;
   // std::cout << "slot_NormalEstimationComplete()" << std::endl;
   this->NormalsPolyData->DeepCopy(this->NormalEstimationFilter->GetOutput());
   this->NormalsPolyData->Modified();
@@ -211,11 +225,13 @@ void PointSetProcessingWidget::on_sldArrowSize_valueChanged(float value)
 void PointSetProcessingWidget::on_btnOrientNormalsToPoint_clicked()
 {
   double orientationPoint[3];
-
+  
   QVector<double> coord = this->coordOrientationPoint->GetCoordinate();
   orientationPoint[0] = coord[0];
   orientationPoint[1] = coord[1];
   orientationPoint[2] = coord[2];
+  
+  this->statusBar()->showMessage("Orienting to point " + QString::number(coord[0]) + " " + QString::number(coord[1]) + " " + QString::number(coord[2]));
 
   vtkSmartPointer<vtkPointSetNormalOrientationToPoint> normalOrientationToPointFilter = vtkSmartPointer<vtkPointSetNormalOrientationToPoint>::New();
   normalOrientationToPointFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
@@ -226,4 +242,6 @@ void PointSetProcessingWidget::on_btnOrientNormalsToPoint_clicked()
   this->NormalsPolyData->Modified();
 
   this->qvtkWidget->GetRenderWindow()->Render();
+  
+  this->statusBar()->showMessage("Finished orienting to point");
 }

@@ -11,7 +11,8 @@ Widgets/LabeledSlider.ui Widgets/CoordinateEditWidget.ui)
 QT4_WRAP_CPP(PointSetProcessingMOC PointSetProcessingWidget.h VTKComputationThread.h
 Widgets/LabeledSlider.h Widgets/FloatSlider.h Widgets/CoordinateEditWidget.h)
 
-add_library(libPointSetProcessing ../vtkPointSetNormalEstimation.cxx ../vtkPointSetNormalOrientationToPoint.cxx)
+add_library(libPointSetProcessing ../vtkPointSetNormalEstimation.cxx ../vtkPointSetNormalOrientation.cxx ../vtkRiemannianGraphFilter.cxx ../vtkEuclideanMinimumSpanningTree.cxx
+../vtkPointSetNormalOrientationToPoint.cxx)
 
 add_executable(PointSetProcessing PointSetProcessing.cpp PointSetProcessingWidget.cpp
 Widgets/LabeledSlider.cpp Widgets/FloatSlider.cpp Widgets/CoordinateEditWidget.cpp

@@ -1,36 +1,34 @@
+// STL
 #include <queue>
 #include <limits>
 
+// VTK
+#include <vtkAdjacentVertexIterator.h>
+#include <vtkBoostConnectedComponents.h>
+#include <vtkBoostPrimMinimumSpanningTree.h>
+#include <vtkCellArray.h>
+#include <vtkCommand.h>
+#include <vtkDoubleArray.h>
+#include <vtkEdgeListIterator.h>
+#include <vtkGraphToPolyData.h>
+#include <vtkKdTreePointLocator.h>
 #include <vtkObjectFactory.h> //for new() macro
 #include <vtkIdList.h>
-#include <vtkPoints.h>
-#include <vtkCellArray.h>
-#include <vtkDoubleArray.h>
-#include <vtkPointData.h>
-#include <vtkTree.h>
 #include <vtkInformation.h>
 #include <vtkInformationVector.h>
-#include <vtkPolyData.h>
-#include <vtkMath.h>
-#include <vtkKdTreePointLocator.h>
 #include <vtkIntArray.h>
-
+#include <vtkPolyData.h>
+#include <vtkPoints.h>
+#include <vtkPointData.h>
+#include <vtkTree.h>
+#include <vtkMath.h>
 #include <vtkMutableUndirectedGraph.h>
-#include <vtkBoostPrimMinimumSpanningTree.h>
 #include <vtkTreeDFSIterator.h>
-#include <vtkAdjacentVertexIterator.h>
-#include <vtkBoostPrimMinimumSpanningTree.h>
 #include <vtkTreeDFSIterator.h>
-#include <vtkEdgeListIterator.h>
-
 #include <vtkXMLPolyDataWriter.h>
-#include <vtkBoostConnectedComponents.h>
-#include <vtkGraphToPolyData.h>
 #include <vtkXMLPolyDataWriter.h>
 
-//#include <vtkGraphLayoutView.h>
-//#include <vtkRenderWindowInteractor.h>
-
+// Custom
 #include "vtkPointSetNormalOrientation.h"
 #include "vtkRiemannianGraphFilter.h"
 
@@ -39,6 +37,8 @@ vtkStandardNewMacro(vtkPointSetNormalOrientation);
 vtkPointSetNormalOrientation::vtkPointSetNormalOrientation()
 {
   this->KNearestNeighbors = 5;
+  this->IterateEvent = vtkCommand::UserEvent + 1;
+  this->IterateEvent = vtkCommand::UserEvent + 2;
 }
 
 
@@ -71,16 +71,8 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
 
   vtkUndirectedGraph* riemannianGraph = vtkUndirectedGraph::SafeDownCast(riemannianGraphFilter->GetOutput());
 
-
-  /*
-  //visualize
-  vtkSmartPointer<vtkGraphLayoutView> GraphLayoutView = vtkSmartPointer<vtkGraphLayoutView>::New();
-  GraphLayoutView->AddRepresentationFromInput(PointGraph);
-  GraphLayoutView->SetLayoutStrategyToSimple2D();
-  GraphLayoutView->ResetCamera();
-  GraphLayoutView->Render();
-  GraphLayoutView->GetInteractor()->Start();
-  */
+  std::string message = "Constructed connectivity graph.";
+  this->InvokeEvent(this->ProgressEvent, &message);
 
   // Find the top point to act as the seed for the normal propagation
   unsigned int maxZId = FindMaxZId(input);
@@ -95,7 +87,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   vtkSmartPointer<vtkEdgeListIterator> edgeListIterator = vtkSmartPointer<vtkEdgeListIterator>::New();
   riemannianGraph->GetEdges(edgeListIterator);
   while(edgeListIterator->HasNext())
-  {
+    {
     vtkEdgeType Edge = edgeListIterator->Next();
     //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << vtkstd::endl;
     double source[3];
@@ -110,13 +102,16 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
     //naive
     //double w = 1.0;
     weights->InsertNextValue(w);
-  }
+    }
 
   // Add the edge weight array to the graph
   riemannianGraph->GetEdgeData()->AddArray(weights);
 
   // std::cout << "Number of Weights: " << vtkDoubleArray::SafeDownCast(PointGraph->GetEdgeData()->GetArray("Weights"))->GetNumberOfTuples() << vtkstd::endl;
 
+  message = "Reweighted edges.";
+  this->InvokeEvent(this->ProgressEvent, &message);
+  
   // Find the minimum spanning tree on the Riemannian graph, starting from the highest point
   vtkSmartPointer<vtkBoostPrimMinimumSpanningTree> mstFilter = vtkSmartPointer<vtkBoostPrimMinimumSpanningTree>::New();
   mstFilter->SetOriginVertex(maxZId);
@@ -128,7 +123,9 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   vtkSmartPointer<vtkTree> mst = vtkSmartPointer<vtkTree>::New();
   mst->ShallowCopy(mstFilter->GetOutput());
 
-/*
+  message = "Found MST.";
+  this->InvokeEvent(this->ProgressEvent, &message);
+  /*
   vtkSmartPointer<vtkGraphLayoutView> MSTView = vtkSmartPointer<vtkGraphLayoutView>::New();
   MSTView->AddRepresentationFromInput(MinimumSpanningTree);
   MSTView->SetLayoutStrategyToTree();
@@ -137,7 +134,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   MSTView->GetInteractor()->Start();
   */
 
-  //traverse the minimum spanning tree to propagate the normal direction
+  // Traverse the minimum spanning tree to propagate the normal direction
   vtkSmartPointer<vtkTreeDFSIterator> dfsIterator = vtkSmartPointer<vtkTreeDFSIterator>::New();
   dfsIterator->SetStartVertex(maxZId);
   dfsIterator->SetTree(mst);
