@@ -72,6 +72,7 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
       }
     else if(this->Mode == RADIUS)
       {
+      kDTree->FindPointsWithinRadius(this->Radius, point, neighborIds);
       // If there are not at least 3 points within the specified radius (the current
       // point gets included in the neighbors set), a plane is not defined. Instead,
       // force it to use 3 points.
