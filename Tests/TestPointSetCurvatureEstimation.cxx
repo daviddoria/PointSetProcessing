@@ -1,6 +1,6 @@
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
-#include <vtkDoubleArray.h>
+#include <vtkDataArray.h>
 #include <vtkPoints.h>
 #include <vtkSmartPointer.h>
 #include <vtkXMLPolyDataReader.h>
@@ -72,21 +72,23 @@ int main (int argc, char *argv[])
     return EXIT_FAILURE;
     }
 
-  vtkDoubleArray* groundTruthCurvature =
-    vtkDoubleArray::SafeDownCast(groundTruth->GetPointData()->GetArray("Curvature"));
-  vtkDoubleArray* estimatedCurvature =
-    vtkDoubleArray::SafeDownCast(curvatureEstimate->GetPointData()->GetArray("Curvature"));
+  vtkDataArray* groundTruthCurvature =
+    groundTruth->GetPointData()->GetArray("Curvature");
+  vtkDataArray* estimatedCurvature =
+    curvatureEstimate->GetPointData()->GetArray("Curvature");
 
   for(vtkIdType i = 0; i < groundTruth->GetNumberOfPoints(); i++)
     {
-    double gc = groundTruthCurvature->GetValue ( i );
-    double ec = estimatedCurvature->GetValue(i);
+//     double gc = groundTruthCurvature->GetValue ( i );
+//     double ec = estimatedCurvature->GetValue(i);
+    double* gc = groundTruthCurvature->GetTuple(i);
+    double* ec = estimatedCurvature->GetTuple(i);
 
-    if(!fuzzyCompare(gc,ec))
+    if(!fuzzyCompare(*gc,*ec))
       {
       cout << "!fuzzyCompare(gc,ec)" << endl;
-      cout << "gc: " << gc << endl;
-      cout << "ec: " << ec << endl;
+      cout << "gc: " << *gc << endl;
+      cout << "ec: " << *ec << endl;
       return EXIT_FAILURE;
       }
     }

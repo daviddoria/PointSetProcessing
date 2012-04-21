@@ -140,15 +140,17 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   dfsIterator->SetStartVertex(maxZId);
   dfsIterator->SetTree(mst);
 
-  vtkDoubleArray* oldNormals = vtkDoubleArray::SafeDownCast(input->GetPointData()->GetNormals());
+  vtkDataArray* oldNormals = input->GetPointData()->GetNormals();
 
   vtkSmartPointer<vtkDoubleArray> newNormals = vtkSmartPointer<vtkDoubleArray>::New();
   newNormals->SetName("Normals");
   newNormals->SetNumberOfComponents(3); //3d normals (ie x,y,z)
   newNormals->SetNumberOfTuples(input->GetNumberOfPoints());
 
-  // Traverse the tree (depth first) and flip normals if necessary
-  double lastNormal[3] = {0.0,0.0,1.0}; //The first normal should be facing (out). Since we used the point with the max z coordinate as the root of this traversal tree, we should check it's normal against the "up" (+z) vector
+  // Traverse the tree (depth first) and flip normals if necessary.
+  //The first normal should be facing (out). Since we used the point with the max z coordinate as the
+  // root of this traversal tree, we should check it's normal against the "up" (+z) vector.
+  double lastNormal[3] = {0.0,0.0,1.0};
   unsigned int nodesVisited = 0;
   unsigned int flippedNormals = 0;
   while(dfsIterator->HasNext())

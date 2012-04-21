@@ -84,7 +84,7 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
 
   // Get the normals
   //vtkDoubleArray* Normals = vtkDoubleArray::SafeDownCast(input->GetPointData()->GetNormals());
-  vtkFloatArray* normals = vtkFloatArray::SafeDownCast(input->GetPointData()->GetNormals());
+  vtkDataArray* normals = input->GetPointData()->GetNormals();
 
   // If normals are not present or the number of normals does not match the number of points, fail
   if(!(normals && (normals->GetNumberOfTuples() == input->GetNumberOfPoints())))

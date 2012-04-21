@@ -19,7 +19,6 @@
 #include "vtkInformationVector.h"
 #include "vtkInformation.h"
 
-#include "vtkDoubleArray.h"
 #include "vtkCellArray.h"
 #include "vtkPolyData.h"
 #include "vtkImageData.h"

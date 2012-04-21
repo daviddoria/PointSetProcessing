@@ -26,6 +26,7 @@ SET(DataDir ./)
 
 SET(BuildTesting OFF CACHE BOOL "Build testing?")
 if(BuildTesting)
+  message("Building tests...")
   add_subdirectory(Tests)
 endif()
 

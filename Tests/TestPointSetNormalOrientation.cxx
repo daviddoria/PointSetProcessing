@@ -1,7 +1,7 @@
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
 #include <vtkPointData.h>
-#include <vtkDoubleArray.h>
+#include <vtkDataArray.h>
 #include <vtkSmartPointer.h>
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLPolyDataWriter.h>
@@ -58,17 +58,20 @@ int main (int argc, char *argv[])
     }
 
   // Get both sets of normals
-  vtkSmartPointer<vtkDoubleArray> groundTruthNormals =
-    vtkDoubleArray::SafeDownCast(groundTruthPolyData->GetPointData()->GetNormals());
-  vtkSmartPointer<vtkDoubleArray> orientedNormals =
-    vtkDoubleArray::SafeDownCast(orientedNormalsPolyData->GetPointData()->GetNormals());
+  vtkDataArray* groundTruthNormals =
+    groundTruthPolyData->GetPointData()->GetNormals();
+  vtkDataArray* orientedNormals =
+    orientedNormalsPolyData->GetPointData()->GetNormals();
 
   for(vtkIdType i = 0; i < groundTruthPolyData->GetNumberOfPoints(); i++)
     {
-    double gt[3];
-    double est[3];
-    orientedNormals->GetTuple(i, est);
-    groundTruthNormals->GetTuple(i, gt);
+//     double gt[3];
+//     double est[3];
+//     orientedNormals->GetTuple(i, est);
+//     groundTruthNormals->GetTuple(i, gt);
+
+    double* gt = groundTruthNormals->GetTuple(i);
+    double* est = orientedNormals->GetTuple(i);
 
     for(unsigned int p = 0; p < 3; p++)
       {

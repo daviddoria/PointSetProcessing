@@ -47,21 +47,21 @@ int vtkEuclideanMinimumSpanningTree::RequestData(vtkInformation *vtkNotUsed(requ
   vtkTree *output = vtkTree::SafeDownCast(
                                             outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  vtkSmartPointer<vtkMutableUndirectedGraph> G = vtkSmartPointer<vtkMutableUndirectedGraph>::New();
+  vtkSmartPointer<vtkMutableUndirectedGraph> g = vtkSmartPointer<vtkMutableUndirectedGraph>::New();
 
   // Create a vector to store vertex IDs
-  std::vector<vtkIdType> Vertices(input->GetNumberOfPoints());
+  std::vector<vtkIdType> vertices(input->GetNumberOfPoints());
 
   // Add a vertex for every point
   for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)
   {
-    Vertices[i] = G->AddVertex();
+    vertices[i] = g->AddVertex();
   }
 
   // Create the edge weight array
-  vtkSmartPointer<vtkDoubleArray> Weights = vtkSmartPointer<vtkDoubleArray>::New();
-  Weights->SetNumberOfComponents(1);
-  Weights->SetName("Weights");
+  vtkSmartPointer<vtkDoubleArray> weights = vtkSmartPointer<vtkDoubleArray>::New();
+  weights->SetNumberOfComponents(1);
+  weights->SetName("Weights");
 
   // Add an edge from every point to every other point (if they do not already exist and they are not self loops)
   for(vtkIdType pointID = 0; pointID < input->GetNumberOfPoints(); pointID++)
@@ -76,20 +76,20 @@ int vtkEuclideanMinimumSpanningTree::RequestData(vtkInformation *vtkNotUsed(requ
 
       // Check if the edge already exists
       vtkSmartPointer<vtkAdjacentVertexIterator> iterator = vtkSmartPointer<vtkAdjacentVertexIterator>::New();
-      G->GetAdjacentVertices(pointID, iterator);
+      g->GetAdjacentVertices(pointID, iterator);
 
-      bool EdgeAlreadyExists = false;
+      bool edgeAlreadyExists = false;
       while(iterator->HasNext())
         {
           if(iterator->Next() == neighborID)
           {
-            EdgeAlreadyExists = true;
+            edgeAlreadyExists = true;
             break;
           }
         }
 
       // Add the new edge
-      if(!EdgeAlreadyExists)
+      if(!edgeAlreadyExists)
         {
         // Get the coordinates of the two points
         double point[3];
@@ -98,34 +98,35 @@ int vtkEuclideanMinimumSpanningTree::RequestData(vtkInformation *vtkNotUsed(requ
         double neighbor[3];
         input->GetPoint(neighborID, neighbor);
 
-        G->AddEdge(pointID, neighborID);
+        g->AddEdge(pointID, neighborID);
 
         // Set the edge weight to the distance between the points
         double neighborPoint[3];
         input->GetPoint(neighborID, neighborPoint);
         double w = sqrt(vtkMath::Distance2BetweenPoints(point, neighbor));
         // std::cout << "Distance: " << w << std::endl;
-        Weights->InsertNextValue(w);
+        weights->InsertNextValue(w);
 
         }
     } // End neighbor loop
   } // End point loop
 
   // Add the point coordinates to the graph
-  G->SetPoints(input->GetPoints());
+  g->SetPoints(input->GetPoints());
 
   // Add the edge weight array to the graph
-  G->GetEdgeData()->AddArray(Weights);
+  g->GetEdgeData()->AddArray(weights);
 
-  //compute the minimum spanning tree
-  vtkSmartPointer<vtkBoostPrimMinimumSpanningTree> MSTFilter = vtkSmartPointer<vtkBoostPrimMinimumSpanningTree>::New();
-  MSTFilter->SetOriginVertex(0);
-  MSTFilter->SetInput(G);
-  MSTFilter->SetEdgeWeightArrayName("Weights");
-  MSTFilter->Update();
+  // Compute the minimum spanning tree
+  vtkSmartPointer<vtkBoostPrimMinimumSpanningTree> mstFilter =
+    vtkSmartPointer<vtkBoostPrimMinimumSpanningTree>::New();
+  mstFilter->SetOriginVertex(0);
+  mstFilter->SetInput(g);
+  mstFilter->SetEdgeWeightArrayName("Weights");
+  mstFilter->Update();
 
   // Set the output of the filter
-  output->ShallowCopy(MSTFilter->GetOutput());
+  output->ShallowCopy(mstFilter->GetOutput());
 
   // Why doesn't MST preseve points??
   output->SetPoints(input->GetPoints());
