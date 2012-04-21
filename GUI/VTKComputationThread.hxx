@@ -36,7 +36,7 @@ void VTKComputationThread<TFilter>::SetFilter(TFilter* filter)
 template<typename TFilter>
 void VTKComputationThread<TFilter>::IterateCallbackFunction(vtkObject* caller, long unsigned int eventId, void* callData)
 {
-  int currentPoint = static_cast<int*>(callData)[0];
+  int currentPoint = reinterpret_cast<int*>(callData)[0];
   //std::cout << "Emitting " << currentPoint << " from IterateCallbackFunction." << std::endl;
   if(currentPoint % 10 == 0 || currentPoint == vtkPolyData::SafeDownCast(this->Filter->GetInput())->GetNumberOfPoints() - 1)
     {

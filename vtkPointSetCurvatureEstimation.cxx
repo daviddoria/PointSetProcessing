@@ -168,8 +168,8 @@ int vtkPointSetCurvatureEstimation::RequestData(vtkInformation *vtkNotUsed(reque
 void vtkPointSetCurvatureEstimation::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Neighbor sphere radius: " << this->Radius << vtkstd::endl;
-  os << indent << "Use auto radius: " << this->UseAutoRadius << vtkstd::endl;
+  os << indent << "Neighbor sphere radius: " << this->Radius << std::endl;
+  os << indent << "Use auto radius: " << this->UseAutoRadius << std::endl;
 }
 
 void ComputeCenterOfMass(vtkPoints* points, double* center)
@@ -227,7 +227,7 @@ void BestFitPlane(vtkPoints *points, vtkPlane *BestPlane)
   //find the center of mass of the points
   double Center[3];
   ComputeCenterOfMass(points, Center);
-  //vtkstd::cout << "Center of mass: " << Center[0] << " " << Center[1] << " " << Center[2] << vtkstd::endl;
+  //std::cout << "Center of mass: " << Center[0] << " " << Center[1] << " " << Center[2] << std::endl;
 
   //Compute sample covariance matrix
   double **a = create_matrix<double> ( 3,3 );

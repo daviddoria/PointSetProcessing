@@ -4,7 +4,7 @@
 #include <vtkXMLPolyDataReader.h>
 #include <vtkGraphReader.h>
 
-#include <vtkstd/limits>
+#include <limits>
 
 #include "vtkEuclideanMinimumSpanningTree.h"
 

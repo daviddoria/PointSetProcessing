@@ -185,7 +185,7 @@ void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane)
   // Find the center of mass of the points
   double center[3];
   CenterOfMass(points, center);
-  // std::cout << "Center of mass: " << Center[0] << " " << Center[1] << " " << Center[2] << vtkstd::endl;
+  // std::cout << "Center of mass: " << Center[0] << " " << Center[1] << " " << Center[2] << std::endl;
 
   //Compute sample covariance matrix
   double **a = create_matrix<double> ( 3,3 );
@@ -225,8 +225,14 @@ void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane)
 
   //Jacobi iteration for the solution of eigenvectors/eigenvalues of a 3x3 real symmetric matrix. Square 3x3 matrix a; output eigenvalues in w; and output eigenvectors in v. Resulting eigenvalues/vectors are sorted in decreasing order; eigenvectors are normalized.
 
-  // Set the plane normal to the smallest eigen vector
-  bestPlane->SetNormal(eigvec[0][2], eigvec[1][2], eigvec[2][2]);
+  // The normal is the direction of the smallest eigen vector.
+  double normal[3] = {eigvec[0][2], eigvec[1][2], eigvec[2][2]};
+
+  // Make sure the normal is normalized.
+  vtkMath::Normalize(normal);
+
+  // Set the plane normal 
+  bestPlane->SetNormal(normal);
 
   // Cleanup
   free_matrix(eigvec);
@@ -246,7 +252,7 @@ void BestFitPlane(vtkPoints* points, vtkPlane* bestPlane, vtkIdList* idsToUse)
   // Find the center of mass of the points
   double center[3];
   CenterOfMass(points, center, idsToUse);
-  // std::cout << "Center of mass: " << Center[0] << " " << Center[1] << " " << Center[2] << vtkstd::endl;
+  // std::cout << "Center of mass: " << Center[0] << " " << Center[1] << " " << Center[2] << std::endl;
 
   //Compute sample covariance matrix
   double **a = create_matrix<double> ( 3,3 );

@@ -73,15 +73,14 @@ int main (int argc, char *argv[])
     }
 
   vtkDoubleArray* groundTruthCurvature =
-    vtkDoubleArray::SafeDownCast ( groundTruth->GetPointData()->GetArray ( "Curvature" ) );
+    vtkDoubleArray::SafeDownCast(groundTruth->GetPointData()->GetArray("Curvature"));
   vtkDoubleArray* estimatedCurvature =
-    vtkDoubleArray::SafeDownCast ( curvatureEstimate->GetPointData()->GetArray ( "Curvature" ) );
+    vtkDoubleArray::SafeDownCast(curvatureEstimate->GetPointData()->GetArray("Curvature"));
 
   for(vtkIdType i = 0; i < groundTruth->GetNumberOfPoints(); i++)
     {
     double gc = groundTruthCurvature->GetValue ( i );
     double ec = estimatedCurvature->GetValue(i);
-
 
     if(!fuzzyCompare(gc,ec))
       {

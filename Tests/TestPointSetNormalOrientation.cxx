@@ -6,7 +6,7 @@
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLPolyDataWriter.h>
 
-#include <vtkstd/limits>
+#include <limits>
 
 #include "vtkPointSetNormalOrientation.h"
 

@@ -4,7 +4,7 @@
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLPolyDataWriter.h>
 
-#include <vtkstd/limits>
+#include <limits>
 
 #include "vtkPointSetOutlierRemoval.h"
 
@@ -19,7 +19,7 @@ int main (int argc, char *argv[])
   // Verify command line arguments
   if(argc != 3)
     {
-    std::cout << "Required arguments: InputFilename GroundTruthFilename" << vtkstd::endl;
+    std::cout << "Required arguments: InputFilename GroundTruthFilename" << std::endl;
     return EXIT_FAILURE;
     }
 

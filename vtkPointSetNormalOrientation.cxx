@@ -89,7 +89,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   while(edgeListIterator->HasNext())
     {
     vtkEdgeType Edge = edgeListIterator->Next();
-    //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << vtkstd::endl;
+    //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << std::endl;
     double source[3];
     double target[3];
     riemannianGraph->GetPoints()->GetPoint(Edge.Source, source);
@@ -97,7 +97,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
 
     //double w = vtkMath::Dot(source, target);
     double w = 1.0 - fabs(vtkMath::Dot(source, target));
-    //vtkstd::cout << "w: " << w << vtkstd::endl;
+    //std::cout << "w: " << w << std::endl;
 
     //naive
     //double w = 1.0;
@@ -107,7 +107,8 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   // Add the edge weight array to the graph
   riemannianGraph->GetEdgeData()->AddArray(weights);
 
-  // std::cout << "Number of Weights: " << vtkDoubleArray::SafeDownCast(PointGraph->GetEdgeData()->GetArray("Weights"))->GetNumberOfTuples() << vtkstd::endl;
+  // std::cout << "Number of Weights: " <<
+  // vtkDoubleArray::SafeDownCast(PointGraph->GetEdgeData()->GetArray("Weights"))->GetNumberOfTuples() << std::endl;
 
   message = "Reweighted edges.";
   this->InvokeEvent(this->ProgressEvent, &message);
@@ -154,7 +155,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
     {
     nodesVisited++;
     vtkIdType nextVertex = dfsIterator->Next();
-    //vtkstd::cout << "Next vertex: " << NextVertex << vtkstd::endl;
+    //std::cout << "Next vertex: " << NextVertex << std::endl;
     double oldNormal[3];
 
     oldNormals->GetTuple(nextVertex, oldNormal);
@@ -177,7 +178,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
 
   //std::cout << "Nodes visited: " << NodesVisited << std::endl;
   //std::cout << "Total nodes: " << MinimumSpanningTree->GetNumberOfVertices() << std::endl;
-  std::cout << "Flipped normals: " << flippedNormals << vtkstd::endl;
+  std::cout << "Flipped normals: " << flippedNormals << std::endl;
 
   output->ShallowCopy(input);
   output->GetPointData()->SetNormals(newNormals);
@@ -206,7 +207,7 @@ unsigned int FindMaxZId(vtkPolyData* input)
 {
   unsigned int MaxZId = 0;
 
-  double MaxZ = -1.0 * vtkstd::numeric_limits<double>::infinity();
+  double MaxZ = -1.0 * std::numeric_limits<double>::infinity();
 
   // Find the highest point
   for(vtkIdType i = 0; i < input->GetNumberOfPoints(); i++)

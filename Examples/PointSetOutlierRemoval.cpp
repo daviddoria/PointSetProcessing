@@ -3,8 +3,6 @@
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkXMLPolyDataReader.h"
 
-#include <vtkstd/string>
-
 #include "vtkPointSetOutlierRemoval.h"
 
 int main (int argc, char *argv[])

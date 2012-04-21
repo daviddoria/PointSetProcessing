@@ -57,6 +57,8 @@ private:
   vtkSmartPointer<vtkPolyDataMapper> PointsMapper;
   vtkSmartPointer<vtkActor> PointsActor;
 
+  // After every filtering operation, the result is deep copied into NormalsPolyData
+  // and therefore automatically displayed since the pipeline is already setup.
   vtkSmartPointer<vtkPolyData> NormalsPolyData;
   vtkSmartPointer<vtkPolyDataMapper> NormalsMapper;
   vtkSmartPointer<vtkActor> NormalsActor;
@@ -75,7 +77,6 @@ private:
 
   QTime Timer;
 
-  //QProgressDialog ProgressDialog;
   QProgressDialog* ProgressDialog;
 };
 

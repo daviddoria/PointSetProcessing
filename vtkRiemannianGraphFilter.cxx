@@ -80,7 +80,7 @@ int vtkRiemannianGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
 
   TreeToUndirectedGraph(emst, g);
 
-  std::cout << "G NumVertices: " << g->GetNumberOfVertices() << vtkstd::endl;
+  std::cout << "G NumVertices: " << g->GetNumberOfVertices() << std::endl;
 
   // Create a KDTree of the points
   vtkSmartPointer<vtkKdTreePointLocator> kdTree = vtkSmartPointer<vtkKdTreePointLocator>::New();
@@ -107,7 +107,7 @@ int vtkRiemannianGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
     for(unsigned int neighbor = 1; neighbor < this->kNeighbors + 1; neighbor++)
       {
       vtkIdType neighborID = result->GetId(neighbor);
-      //vtkstd::cout << "neighborID: " << neighborID << vtkstd::endl;
+      //std::cout << "neighborID: " << neighborID << std::endl;
       vtkSmartPointer<vtkAdjacentVertexIterator> iterator = vtkSmartPointer<vtkAdjacentVertexIterator>::New();
       g->GetAdjacentVertices(pointID, iterator);
       bool EdgeAlreadyExists = false;
@@ -151,7 +151,7 @@ void vtkRiemannianGraphFilter::PrintSelf(ostream &os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
-  os << indent << "kneighbors: " << this->kNeighbors << vtkstd::endl;
+  os << indent << "kneighbors: " << this->kNeighbors << std::endl;
 }
 
 void TreeToUndirectedGraph(vtkTree* tree, vtkMutableUndirectedGraph* undirectedGraph)
@@ -167,7 +167,7 @@ void TreeToUndirectedGraph(vtkTree* tree, vtkMutableUndirectedGraph* undirectedG
   while(edgeIterator->HasNext())
   {
     vtkEdgeType edge = edgeIterator->Next();
-    //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << vtkstd::endl;
+    //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << std::endl;
     undirectedGraph->AddEdge(edge.Source, edge.Target);
   }
 

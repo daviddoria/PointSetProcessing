@@ -3,7 +3,7 @@
 // At every point in the point set, vtkPointSetNormalEstimation computes the best
 // fit plane of the set of points within a specified radius of the point (or a fixed number of neighbors).
 // The normal of this plane is used as an estimate of the normal of the surface that would go through
-// the points.
+// the points. The resulting normals are stored as a vtkFloatArray on the PointData of the output vtkPolyData.
 
 #ifndef __vtkPointSetNormalEstimation_h
 #define __vtkPointSetNormalEstimation_h

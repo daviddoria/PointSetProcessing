@@ -161,6 +161,8 @@ void PointSetProcessingWidget::OpenFile(const std::string& fileName)
   double p0[3];
   this->PointsPolyData->GetPoint(0,p0);
   this->SphereActor->SetPosition(p0);
+
+  this->statusBar()->showMessage("Opened file with " + QString::number(this->PointsPolyData->GetNumberOfPoints()) + " points.");
 }
 
 void PointSetProcessingWidget::on_actionSave_activated()
@@ -176,7 +178,7 @@ void PointSetProcessingWidget::on_actionSave_activated()
 
   vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   writer->SetFileName(fileName.toStdString().c_str());
-  writer->SetInputConnection(this->NormalEstimationFilter->GetOutputPort());
+  writer->SetInputConnection(this->NormalsPolyData->GetProducerPort());
   writer->Write();
 }
 
