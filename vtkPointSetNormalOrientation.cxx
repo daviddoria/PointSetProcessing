@@ -66,7 +66,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   NearestNeighborGraphFilter->Update();
   */
   vtkSmartPointer<vtkRiemannianGraphFilter> riemannianGraphFilter = vtkSmartPointer<vtkRiemannianGraphFilter>::New();
-  riemannianGraphFilter->SetInput(input);
+  riemannianGraphFilter->SetInputData(input);
   riemannianGraphFilter->Update();
 
   vtkUndirectedGraph* riemannianGraph = vtkUndirectedGraph::SafeDownCast(riemannianGraphFilter->GetOutput());
@@ -116,7 +116,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   // Find the minimum spanning tree on the Riemannian graph, starting from the highest point
   vtkSmartPointer<vtkBoostPrimMinimumSpanningTree> mstFilter = vtkSmartPointer<vtkBoostPrimMinimumSpanningTree>::New();
   mstFilter->SetOriginVertex(maxZId);
-  mstFilter->SetInput(riemannianGraph);
+  mstFilter->SetInputData(riemannianGraph);
   mstFilter->SetEdgeWeightArrayName("Weights");
   mstFilter->Update();
 

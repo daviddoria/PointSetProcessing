@@ -26,13 +26,13 @@ int main (int argc, char *argv[])
 
   // Estimate normals
   vtkSmartPointer<vtkPointSetNormalEstimation> normalEstimation = vtkSmartPointer<vtkPointSetNormalEstimation>::New();
-  normalEstimation->SetInput(reader->GetOutput());
+  normalEstimation->SetInputData(reader->GetOutput());
   normalEstimation->Update();
 
   // Write the output file with the estimated normals
   vtkSmartPointer<vtkXMLPolyDataWriter> Writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   Writer->SetFileName(outputFileName.c_str());
-  Writer->SetInput(normalEstimation->GetOutput());
+  Writer->SetInputData(normalEstimation->GetOutput());
   Writer->Write();
 
   return 0;

@@ -10,6 +10,11 @@ if(BuildPlugins)
 else()
   FIND_PACKAGE(VTK REQUIRED)
   INCLUDE(${VTK_USE_FILE})
+  if("${VTK_VERSION}" VERSION_LESS 6.0)
+    message("Your VTK version is too old! Must be greater than 6.0")
+  else()
+    message("Valid VTK version (${VTK_VERSION}).")
+  endif()
 endif()
 
 

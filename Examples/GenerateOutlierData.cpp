@@ -43,7 +43,7 @@ int main (int argc, char *argv[])
 
   vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   writer->SetFileName("Input.vtp");
-  writer->SetInput(polydata);
+  writer->SetInputData(polydata);
   writer->Write();
 
   return EXIT_SUCCESS;

@@ -22,7 +22,7 @@ int main (int argc, char *argv[])
 
   // Remove outliers
   vtkSmartPointer<vtkPointSetOutlierRemoval> outlierRemoval = vtkSmartPointer<vtkPointSetOutlierRemoval>::New();
-  outlierRemoval->SetInput(reader->GetOutput());
+  outlierRemoval->SetInputData(reader->GetOutput());
   outlierRemoval->SetPercentToRemove(.01); //remove 1% of the points
   outlierRemoval->Update();
 
@@ -30,7 +30,7 @@ int main (int argc, char *argv[])
 
   vtkSmartPointer<vtkXMLPolyDataWriter> outputWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   outputWriter->SetFileName(OutputFilename.c_str());
-  outputWriter->SetInput(outputPolydata);
+  outputWriter->SetInputData(outputPolydata);
   outputWriter->Write();
 
   return EXIT_SUCCESS;

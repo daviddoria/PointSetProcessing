@@ -121,7 +121,7 @@ int vtkEuclideanMinimumSpanningTree::RequestData(vtkInformation *vtkNotUsed(requ
   vtkSmartPointer<vtkBoostPrimMinimumSpanningTree> mstFilter =
     vtkSmartPointer<vtkBoostPrimMinimumSpanningTree>::New();
   mstFilter->SetOriginVertex(0);
-  mstFilter->SetInput(g);
+  mstFilter->SetInputData(g);
   mstFilter->SetEdgeWeightArrayName("Weights");
   mstFilter->Update();
 

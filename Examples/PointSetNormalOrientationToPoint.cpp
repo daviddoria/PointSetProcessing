@@ -25,13 +25,13 @@ int main (int argc, char *argv[])
 
   // Perform normal orientation
   vtkSmartPointer<vtkPointSetNormalOrientationToPoint> normalOrientationFilter = vtkSmartPointer<vtkPointSetNormalOrientationToPoint>::New();
-  normalOrientationFilter->SetInput(reader->GetOutput());
+  normalOrientationFilter->SetInputData(reader->GetOutput());
   normalOrientationFilter->Update();
 
   // Write the new normals to a file
   vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   writer->SetFileName(outputFilename.c_str());
-  writer->SetInput(normalOrientationFilter->GetOutput());
+  writer->SetInputData(normalOrientationFilter->GetOutput());
   writer->Write();
 
   return EXIT_SUCCESS;

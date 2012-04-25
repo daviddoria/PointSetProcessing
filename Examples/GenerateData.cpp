@@ -20,12 +20,12 @@ int main (int argc, char *argv[])
   polyData->SetPoints(points);
 
   vtkSmartPointer<vtkVertexGlyphFilter> glyphFilter = vtkSmartPointer<vtkVertexGlyphFilter>::New();
-  glyphFilter->SetInputConnection(polyData->GetProducerPort());
+  glyphFilter->SetInputData(polyData);
   glyphFilter->Update();
 
   // Write the result to a file
   vtkSmartPointer<vtkXMLPolyDataWriter> polyDataWriter = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-  polyDataWriter->SetInput(glyphFilter->GetOutput());
+  polyDataWriter->SetInputData(glyphFilter->GetOutput());
   polyDataWriter->SetFileName("SpherePoints.vtp");
   polyDataWriter->Write();
 

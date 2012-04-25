@@ -27,7 +27,7 @@ int main (int argc, char *argv[])
 
   // Estimate the curvature
   vtkSmartPointer<vtkPointSetCurvatureEstimation> curvatureEstimationFilter = vtkSmartPointer<vtkPointSetCurvatureEstimation>::New();
-  curvatureEstimationFilter->SetInput(inputPolyData);
+  curvatureEstimationFilter->SetInputData(inputPolyData);
   curvatureEstimationFilter->Update();
 
   vtkPolyData* curvatureEstimate = curvatureEstimationFilter->GetOutput();
@@ -35,7 +35,7 @@ int main (int argc, char *argv[])
   //write the output point set with curvature annotation to a file
   vtkSmartPointer<vtkXMLPolyDataWriter> Writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   Writer->SetFileName(outputFilename.c_str());
-  Writer->SetInput(curvatureEstimate);
+  Writer->SetInputData(curvatureEstimate);
   Writer->Write();
 
   return EXIT_SUCCESS;

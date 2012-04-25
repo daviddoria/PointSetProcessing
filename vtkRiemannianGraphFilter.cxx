@@ -64,7 +64,7 @@ int vtkRiemannianGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
                                             outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkSmartPointer<vtkEuclideanMinimumSpanningTree> emstFilter = vtkSmartPointer<vtkEuclideanMinimumSpanningTree>::New();
-  emstFilter->SetInput(input);
+  emstFilter->SetInputData(input);
   emstFilter->Update();
 
   vtkTree* emst = emstFilter->GetOutput();
