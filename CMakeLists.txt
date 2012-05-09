@@ -22,13 +22,16 @@ endif()
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
-if(NOT VTK_USE_BOOST)
-  MESSAGE(SEND_ERROR "VTK must be built with VTK_USE_BOOST=ON.")
-endif ()
+if(NOT vtkInfovisBoost_LOADED)
+  message(FATAL_ERROR "vtkInfovisBoost is required but not available.")
+endif()
+
+if(NOT vtkInfovisBoostGraphAlgorithms_LOADED)
+  message(FATAL_ERROR "vtkInfovisBoostGraphAlgorithms is required but not available.")
+endif()
 
 SET(PointSetProcessingDir ${CMAKE_CURRENT_SOURCE_DIR})
 SET(DataDir ./)
-
 
 SET(BuildTesting OFF CACHE BOOL "Build testing?")
 if(BuildTesting)
