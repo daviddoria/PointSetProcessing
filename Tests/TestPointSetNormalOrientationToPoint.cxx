@@ -50,7 +50,7 @@ int main (int argc, char *argv[])
   // Orient the normals toward +z
   vtkSmartPointer<vtkPointSetNormalOrientationToPoint> orientationToPointFilter =
     vtkSmartPointer<vtkPointSetNormalOrientationToPoint>::New();
-  orientationToPointFilter->SetInputConnection(polyData->GetProducerPort());
+  orientationToPointFilter->SetInputData(polyData);
   double orientationPoint[3] = {0,0,10};
   orientationToPointFilter->SetOrientationPoint(orientationPoint);
   orientationToPointFilter->Update();
@@ -87,7 +87,7 @@ int main (int argc, char *argv[])
 void WritePolyData(vtkPolyData* polyData, const std::string& fileName)
 {
   vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
-  writer->SetInputConnection(polyData->GetProducerPort());
+  writer->SetInputData(polyData);
   writer->SetFileName(fileName.c_str());
   writer->Write();
 }

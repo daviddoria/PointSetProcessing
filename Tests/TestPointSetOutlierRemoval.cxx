@@ -34,7 +34,7 @@ int main (int argc, char *argv[])
 
   // Estimate normals
   vtkSmartPointer<vtkPointSetOutlierRemoval> outlierRemoval = vtkSmartPointer<vtkPointSetOutlierRemoval>::New();
-  outlierRemoval->SetInput(inputReader->GetOutput());
+  outlierRemoval->SetInputConnection(inputReader->GetOutputPort());
   outlierRemoval->SetPercentToRemove(.01); //remove 1% of the points
   outlierRemoval->Update();
 

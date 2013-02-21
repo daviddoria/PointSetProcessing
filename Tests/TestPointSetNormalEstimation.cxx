@@ -39,7 +39,7 @@ int main (int argc, char *argv[])
   // Estimate normals
   vtkSmartPointer<vtkPointSetNormalEstimation> normalEstimation =
       vtkSmartPointer<vtkPointSetNormalEstimation>::New();
-  normalEstimation->SetInput(inputReader->GetOutput());
+  normalEstimation->SetInputConnection(inputReader->GetOutputPort());
   normalEstimation->SetNumberOfNeighbors(5);
   normalEstimation->Update();
 
