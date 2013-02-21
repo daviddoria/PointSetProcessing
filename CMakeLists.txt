@@ -33,19 +33,22 @@ endif()
 SET(PointSetProcessingDir ${CMAKE_CURRENT_SOURCE_DIR})
 SET(DataDir ./)
 
-SET(BuildTesting OFF CACHE BOOL "Build testing?")
-if(BuildTesting)
+include(CTest)
+
+if(BUILD_TESTING)
   message("Building tests...")
   add_subdirectory(Tests)
 endif()
 
 
-SET(BuildGUI OFF CACHE BOOL "Build GUI?")
+option(BuildGUI "Build GUI?" OFF)
 if(BuildGUI)
+  message("Building GUI...")
   add_subdirectory(GUI)
 endif()
 
-SET(BuildExamples OFF CACHE BOOL "Build examples?")
+option(BuildExamples "Build examples?" OFF)
 if(BuildExamples)
+  message("Building examples...")
   add_subdirectory(Examples)
 endif()

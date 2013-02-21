@@ -57,14 +57,14 @@ void PointSetProcessingWidget::SharedConstructor()
 
   this->PointsPolyData = vtkSmartPointer<vtkPolyData>::New();
   this->PointsMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  this->PointsMapper->SetInputConnection(this->PointsPolyData->GetProducerPort());
+  this->PointsMapper->SetInputData(this->PointsPolyData);
   this->PointsActor = vtkSmartPointer<vtkActor>::New();
   this->PointsActor->SetMapper(this->PointsMapper);
 
   this->NormalEstimationFilter = vtkSmartPointer<vtkPointSetNormalEstimation>::New();
   this->NormalEstimationFilter->SetModeToRadius();
   this->NormalEstimationFilter->SetRadius(this->sldNeighborRadius->GetValue());
-  this->NormalEstimationFilter->SetInputConnection(this->PointsPolyData->GetProducerPort());
+  this->NormalEstimationFilter->SetInputData(this->PointsPolyData);
 
   this->NormalEstimationThread = new QThread;
   this->NormalEstimationComputationObject = new VTKComputationThread<vtkPointSetNormalEstimation>;
@@ -76,7 +76,7 @@ void PointSetProcessingWidget::SharedConstructor()
 
   // Setup the arrows
   this->HedgeHogFilter = vtkSmartPointer<vtkHedgeHog>::New();
-  this->HedgeHogFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
+  this->HedgeHogFilter->SetInputData(this->NormalsPolyData);
   this->HedgeHogFilter->SetVectorModeToUseNormal();
   this->HedgeHogFilter->SetScaleFactor(this->sldArrowSize->GetValue());
   this->HedgeHogFilter->Update();
@@ -126,7 +126,7 @@ void PointSetProcessingWidget::on_btnOrientNormals_clicked()
 {
   // Perform normal orientation
   vtkSmartPointer<vtkPointSetNormalOrientation> normalOrientationFilter = vtkSmartPointer<vtkPointSetNormalOrientation>::New();
-  normalOrientationFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
+  normalOrientationFilter->SetInputData(this->NormalsPolyData);
   normalOrientationFilter->SetKNearestNeighbors(10);
   normalOrientationFilter->Update();
   
@@ -178,7 +178,7 @@ void PointSetProcessingWidget::on_actionSave_activated()
 
   vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
   writer->SetFileName(fileName.toStdString().c_str());
-  writer->SetInputConnection(this->NormalsPolyData->GetProducerPort());
+  writer->SetInputData(this->NormalsPolyData);
   writer->Write();
 }
 
@@ -236,7 +236,7 @@ void PointSetProcessingWidget::on_btnOrientNormalsToPoint_clicked()
   this->statusBar()->showMessage("Orienting to point " + QString::number(coord[0]) + " " + QString::number(coord[1]) + " " + QString::number(coord[2]));
 
   vtkSmartPointer<vtkPointSetNormalOrientationToPoint> normalOrientationToPointFilter = vtkSmartPointer<vtkPointSetNormalOrientationToPoint>::New();
-  normalOrientationToPointFilter->SetInputConnection(this->NormalsPolyData->GetProducerPort());
+  normalOrientationToPointFilter->SetInputData(this->NormalsPolyData);
   normalOrientationToPointFilter->SetOrientationPoint(orientationPoint);
   normalOrientationToPointFilter->Update();
 
