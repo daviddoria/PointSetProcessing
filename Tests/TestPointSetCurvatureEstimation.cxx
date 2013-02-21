@@ -45,7 +45,7 @@ int main (int argc, char *argv[])
   // Estimate normals
   vtkSmartPointer<vtkPointSetCurvatureEstimation> curvatureEstimation =
     vtkSmartPointer<vtkPointSetCurvatureEstimation>::New();
-  curvatureEstimation->SetInput(inputReader->GetOutput());
+  curvatureEstimation->SetInputConnection(inputReader->GetOutputPort());
   curvatureEstimation->Update();
 
   vtkPolyData* curvatureEstimate = curvatureEstimation->GetOutput();
