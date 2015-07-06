@@ -33,13 +33,22 @@ endif()
 SET(PointSetProcessingDir ${CMAKE_CURRENT_SOURCE_DIR})
 SET(DataDir ./)
 
+add_library(PointSetProcessing
+    vtkEuclideanMinimumSpanningTree.cxx
+    vtkPointSetCurvatureEstimation.cxx
+    vtkPointSetNormalEstimation.cxx
+    vtkPointSetNormalOrientation.cxx
+    vtkPointSetNormalOrientationToPoint.cxx
+    vtkPointSetOutlierRemoval.cxx
+    vtkRiemannianGraphFilter.cxx)
+target_link_libraries(PointSetProcessing ${VTK_LIBRARIES})
+
 include(CTest)
 
 if(BUILD_TESTING)
   message("Building tests...")
   add_subdirectory(Tests)
 endif()
-
 
 option(BuildGUI "Build GUI?" OFF)
 if(BuildGUI)
