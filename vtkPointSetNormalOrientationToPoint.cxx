@@ -17,9 +17,9 @@ vtkStandardNewMacro(vtkPointSetNormalOrientationToPoint);
 
 vtkPointSetNormalOrientationToPoint::vtkPointSetNormalOrientationToPoint()
 {
-  this->OrientationPoint[0] = 0.0d;
-  this->OrientationPoint[1] = 0.0d;
-  this->OrientationPoint[2] = 0.0d;
+  this->OrientationPoint[0] = 0.0;
+  this->OrientationPoint[1] = 0.0;
+  this->OrientationPoint[2] = 0.0;
 }
 
 int vtkPointSetNormalOrientationToPoint::RequestData(vtkInformation *vtkNotUsed(request),

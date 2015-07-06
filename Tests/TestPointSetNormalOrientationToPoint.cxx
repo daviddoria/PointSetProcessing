@@ -31,7 +31,7 @@ int main (int argc, char *argv[])
     for(unsigned int y = 0; y < 2; ++y)
       {
       points->InsertNextPoint(x,y,0);
-      float randomValue = drand48();
+      float randomValue = (float(rand()) / RAND_MAX);
       if(randomValue < .5)
         {
         randomValue *= -1.0f;
