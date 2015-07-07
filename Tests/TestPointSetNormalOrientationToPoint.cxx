@@ -19,8 +19,11 @@ bool fuzzyCompare(T a, T b)
   return fabs(a - b) < std::numeric_limits<T>::epsilon();
 }
 
-int main (int argc, char *argv[])
+int main (int, char *[])
 {
+  // Without this line, the random numbers will be the same every iteration.
+  vtkMath::RandomSeed(time(NULL));
+
   // Create a plane of points, each with a random normal.
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   vtkSmartPointer<vtkFloatArray> normals = vtkSmartPointer<vtkFloatArray>::New();
@@ -31,7 +34,7 @@ int main (int argc, char *argv[])
     for(unsigned int y = 0; y < 2; ++y)
       {
       points->InsertNextPoint(x,y,0);
-      float randomValue = (float(rand()) / RAND_MAX);
+      float randomValue = vtkMath::Random();
       if(randomValue < .5)
         {
         randomValue *= -1.0f;
