@@ -34,6 +34,7 @@ SET(PointSetProcessingDir ${CMAKE_CURRENT_SOURCE_DIR})
 SET(DataDir ./)
 
 add_library(PointSetProcessing
+	vtkKNNGraphFilter.cxx
     vtkEuclideanMinimumSpanningTree.cxx
     vtkPointSetCurvatureEstimation.cxx
     vtkPointSetNormalEstimation.cxx

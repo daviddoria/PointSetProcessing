@@ -59,12 +59,11 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   vtkPolyData *output = vtkPolyData::SafeDownCast(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  /*
-  vtkSmartPointer<vtkNearestNeighborGraph> NearestNeighborGraphFilter = vtkSmartPointer<vtkNearestNeighborGraph>::New();
+  /*vtkSmartPointer<vtkNearestNeighborGraph> NearestNeighborGraphFilter = vtkSmartPointer<vtkNearestNeighborGraph>::New();
   NearestNeighborGraphFilter->SetInput(input);
   NearestNeighborGraphFilter->SetkNeighbors(this->KNearestNeighbors);
-  NearestNeighborGraphFilter->Update();
-  */
+  NearestNeighborGraphFilter->Update();*/
+  
   vtkSmartPointer<vtkRiemannianGraphFilter> riemannianGraphFilter = vtkSmartPointer<vtkRiemannianGraphFilter>::New();
   riemannianGraphFilter->SetInputData(input);
   riemannianGraphFilter->Update();
