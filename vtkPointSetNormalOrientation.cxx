@@ -31,11 +31,17 @@
 // Custom
 #include "vtkPointSetNormalOrientation.h"
 #include "vtkRiemannianGraphFilter.h"
+#include "vtkKNNGraphFilter.h"
+
+// Define graph filter types
+const unsigned int RIEMANN_GRAPH = 0;
+const unsigned int KNN_GRAPH = 1;
 
 vtkStandardNewMacro(vtkPointSetNormalOrientation);
 
 vtkPointSetNormalOrientation::vtkPointSetNormalOrientation()
 {
+  this->GraphFilterType = RIEMANN_GRAPH;
   this->KNearestNeighbors = 5;
   this->IterateEvent = vtkCommand::UserEvent + 1;
   this->IterateEvent = vtkCommand::UserEvent + 2;
@@ -59,17 +65,27 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   vtkPolyData *output = vtkPolyData::SafeDownCast(
       outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
-  /*
-  vtkSmartPointer<vtkNearestNeighborGraph> NearestNeighborGraphFilter = vtkSmartPointer<vtkNearestNeighborGraph>::New();
-  NearestNeighborGraphFilter->SetInput(input);
-  NearestNeighborGraphFilter->SetkNeighbors(this->KNearestNeighbors);
-  NearestNeighborGraphFilter->Update();
-  */
+  vtkUndirectedGraph* graph = vtkSmartPointer<vtkUndirectedGraph>::New();
+  vtkSmartPointer<vtkKNNGraphFilter> KNNGraphFilter = vtkSmartPointer<vtkKNNGraphFilter>::New();
   vtkSmartPointer<vtkRiemannianGraphFilter> riemannianGraphFilter = vtkSmartPointer<vtkRiemannianGraphFilter>::New();
-  riemannianGraphFilter->SetInputData(input);
-  riemannianGraphFilter->Update();
-
-  vtkUndirectedGraph* riemannianGraph = vtkUndirectedGraph::SafeDownCast(riemannianGraphFilter->GetOutput());
+  if (this->GraphFilterType == KNN_GRAPH)
+  {    
+    KNNGraphFilter->SetInputData(input);
+    KNNGraphFilter->SetKNeighbors(this->KNearestNeighbors);
+    KNNGraphFilter->Update();
+    graph = vtkUndirectedGraph::SafeDownCast(KNNGraphFilter->GetOutput());
+  }
+  else if (this->GraphFilterType == RIEMANN_GRAPH)
+  {    
+    riemannianGraphFilter->SetInputData(input);
+    riemannianGraphFilter->Update();
+    graph = vtkUndirectedGraph::SafeDownCast(riemannianGraphFilter->GetOutput());
+  }
+  else
+  {
+    std::cerr << "Wrong GraphFilterType! Should be either 0 (RIEMANN_GRAPH) or 1 (KNN_GRAPH)." << std::endl;
+    return 0;
+  }
 
   std::string message = "Constructed connectivity graph.";
   this->InvokeEvent(this->ProgressEvent, &message);
@@ -85,15 +101,15 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
 
   // Reweight edges
   vtkSmartPointer<vtkEdgeListIterator> edgeListIterator = vtkSmartPointer<vtkEdgeListIterator>::New();
-  riemannianGraph->GetEdges(edgeListIterator);
+  graph->GetEdges(edgeListIterator);
   while(edgeListIterator->HasNext())
     {
     vtkEdgeType Edge = edgeListIterator->Next();
     //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << std::endl;
     double source[3];
     double target[3];
-    riemannianGraph->GetPoints()->GetPoint(Edge.Source, source);
-    riemannianGraph->GetPoints()->GetPoint(Edge.Target, target);
+    graph->GetPoints()->GetPoint(Edge.Source, source);
+    graph->GetPoints()->GetPoint(Edge.Target, target);
 
     //double w = vtkMath::Dot(source, target);
     double w = 1.0 - fabs(vtkMath::Dot(source, target));
@@ -105,7 +121,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
     }
 
   // Add the edge weight array to the graph
-  riemannianGraph->GetEdgeData()->AddArray(weights);
+  graph->GetEdgeData()->AddArray(weights);
 
   // std::cout << "Number of Weights: " <<
   // vtkDoubleArray::SafeDownCast(PointGraph->GetEdgeData()->GetArray("Weights"))->GetNumberOfTuples() << std::endl;
@@ -116,7 +132,7 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   // Find the minimum spanning tree on the Riemannian graph, starting from the highest point
   vtkSmartPointer<vtkBoostPrimMinimumSpanningTree> mstFilter = vtkSmartPointer<vtkBoostPrimMinimumSpanningTree>::New();
   mstFilter->SetOriginVertex(maxZId);
-  mstFilter->SetInputData(riemannianGraph);
+  mstFilter->SetInputData(graph);
   mstFilter->SetEdgeWeightArrayName("Weights");
   mstFilter->Update();
 

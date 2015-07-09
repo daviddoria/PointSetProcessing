@@ -32,6 +32,8 @@ class vtkPointSetNormalOrientation : public vtkPolyDataAlgorithm
 
     vtkSetMacro(KNearestNeighbors, unsigned int);
     vtkGetMacro(KNearestNeighbors, unsigned int);
+    vtkSetMacro(GraphFilterType, unsigned int);
+    vtkGetMacro(GraphFilterType, unsigned int);
 
     int IterateEvent;
     int ProgressEvent;
@@ -44,6 +46,7 @@ class vtkPointSetNormalOrientation : public vtkPolyDataAlgorithm
   private:
 
     unsigned int KNearestNeighbors; //this is used to determine how many neighbors are connected in the graph
+    unsigned int GraphFilterType; // wether to use the vtkRiemannianGraphFilter (default) or the vtkKNNGraphFilter
 
 };
 
