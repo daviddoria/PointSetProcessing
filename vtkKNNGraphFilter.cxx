@@ -55,8 +55,7 @@ int vtkKNNGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
   vtkPointSet* input = vtkPointSet::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
   
-  vtkGraph* output = vtkGraph::SafeDownCast(
-                                            outInfo->Get(vtkDataObject::DATA_OBJECT()));
+  vtkGraph* output = vtkGraph::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   
   vtkSmartPointer<vtkMutableUndirectedGraph> g = 
       vtkSmartPointer<vtkMutableUndirectedGraph>::New();

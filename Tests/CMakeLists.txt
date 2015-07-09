@@ -28,6 +28,7 @@ ADD_TEST(TestPointSetNormalEstimation TestPointSetNormalEstimation ${DataDir}/vt
 ADD_EXECUTABLE(TestPointSetNormalOrientation TestPointSetNormalOrientation.cxx 
 ${PointSetProcessingDir}/vtkPointSetNormalOrientation.cxx
 ${PointSetProcessingDir}/vtkEuclideanMinimumSpanningTree.cxx  
-${PointSetProcessingDir}/vtkRiemannianGraphFilter.cxx)
+${PointSetProcessingDir}/vtkRiemannianGraphFilter.cxx
+${PointSetProcessingDir}/vtkKNNGraphFilter.cxx)
 TARGET_LINK_LIBRARIES(TestPointSetNormalOrientation ${VTK_LIBRARIES})
 ADD_TEST(TestPointSetNormalOrientation TestPointSetNormalOrientation ${DataDir}/vtkPointSetNormalOrientation_Input.vtp ${DataDir}/vtkPointSetNormalOrientation_GroundTruth.vtp)
