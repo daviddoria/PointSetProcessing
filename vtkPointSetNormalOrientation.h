@@ -24,8 +24,11 @@ class vtkPolyData;
 
 class vtkPointSetNormalOrientation : public vtkPolyDataAlgorithm
 {
-
   public:
+    // Define graph filter types
+    static const unsigned int RIEMANN_GRAPH = 0;
+    static const unsigned int KNN_GRAPH = 1;
+
     static vtkPointSetNormalOrientation *New();
     vtkTypeMacro(vtkPointSetNormalOrientation, vtkPolyDataAlgorithm);
     void PrintSelf(ostream &os, vtkIndent indent);

@@ -8,6 +8,7 @@
 #include <vtkXMLPolyDataWriter.h>
 
 #include <limits>
+#include <ctime>
 
 #include "vtkPointSetNormalOrientationToPoint.h"
 
@@ -22,7 +23,7 @@ bool fuzzyCompare(T a, T b)
 int main (int, char *[])
 {
   // Without this line, the random numbers will be the same every iteration.
-  vtkMath::RandomSeed(time(NULL));
+  vtkMath::RandomSeed(std::time(NULL));
 
   // Create a plane of points, each with a random normal.
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
