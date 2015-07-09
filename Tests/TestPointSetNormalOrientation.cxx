@@ -37,6 +37,7 @@ int main (int argc, char *argv[])
 
   // Estimate normals
   vtkSmartPointer<vtkPointSetNormalOrientation> normalOrientation = vtkSmartPointer<vtkPointSetNormalOrientation>::New();
+  normalOrientation->SetGraphFilterType(vtkPointSetNormalOrientation::RIEMANN_GRAPH);
   normalOrientation->SetInputConnection(inputReader->GetOutputPort());
   normalOrientation->Update();
 
