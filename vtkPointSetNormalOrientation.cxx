@@ -33,6 +33,7 @@
 #include "vtkRiemannianGraphFilter.h"
 #include "vtkKNNGraphFilter.h"
 
+// Define graph filter types
 const unsigned int RIEMANN_GRAPH = 0;
 const unsigned int KNN_GRAPH = 1;
 
