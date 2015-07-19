@@ -89,6 +89,19 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
     normalArray->SetTuple( pointId, normal ) ;
     }
 
+  // Normalize normals
+  double normal[3] = {0, 0, 0};
+  double magnitude;
+  for (int i = 0; i < normalArray->GetNumberOfTuples(); ++i)
+  {
+	normalArray->GetTuple(i, normal);
+	magnitude = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+	normal[0] = normal[0] / magnitude;
+	normal[1] = normal[1] / magnitude;
+	normal[2] = normal[2] / magnitude;
+	normalArray->SetTuple(i, normal);
+  }
+  
   input->GetPointData()->SetNormals(normalArray);
 
   output->ShallowCopy(input);
