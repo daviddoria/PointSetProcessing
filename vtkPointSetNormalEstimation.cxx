@@ -88,7 +88,7 @@ int vtkPointSetNormalEstimation::RequestData(vtkInformation *vtkNotUsed(request)
     bestPlane->GetNormal(normal);
     normalArray->SetTuple( pointId, normal ) ;
     }
-
+  
   input->GetPointData()->SetNormals(normalArray);
 
   output->ShallowCopy(input);
