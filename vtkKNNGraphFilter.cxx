@@ -52,9 +52,9 @@ int vtkKNNGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
 
   // get the input and ouptut
-  vtkPointSet* input = vtkPointSet::SafeDownCast(
+  vtkPolyData* input = vtkPolyData::SafeDownCast(
       inInfo->Get(vtkDataObject::DATA_OBJECT()));
-  
+ 
   vtkGraph* output = vtkGraph::SafeDownCast(outInfo->Get(vtkDataObject::DATA_OBJECT()));
   
   vtkSmartPointer<vtkMutableUndirectedGraph> g = 
@@ -86,9 +86,10 @@ int vtkKNNGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
     {
     if(pointID % 1000 == 0)
       cout << "pointID: " << pointID << " out of " << input->GetNumberOfPoints() << endl;
-    
+
     double point[3];
-    input->GetPoint(pointID, point);
+	input->GetPointData()->GetNormals()->GetTuple(pointID, point);
+
     vtkSmartPointer<vtkIdList> result = 
         vtkSmartPointer<vtkIdList>::New();
   
@@ -116,7 +117,7 @@ int vtkKNNGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
         
         //set the edge weight to the distance between the points
         double neighborPoint[3];
-        input->GetPoint(neighborID, neighborPoint);
+		input->GetPointData()->GetNormals()->GetTuple(neighborID, neighborPoint);
         
         double w = sqrt(vtkMath::Distance2BetweenPoints(point, neighborPoint));
         //cout << "Distance: " << w << endl;
@@ -125,9 +126,17 @@ int vtkKNNGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
         }
       }
     }
-  
+
+  double normal[3] = {0, 0, 0};
+  vtkSmartPointer<vtkPoints> normals = vtkSmartPointer<vtkPoints>::New();
+  for (unsigned int i = 0; i < input->GetNumberOfPoints(); i++)
+  {	
+	input->GetPointData()->GetNormals()->GetTuple(i, normal);
+	normals->InsertNextPoint(normal);
+  }	
+
   //add the point coordinates to the graph
-  g->SetPoints(input->GetPoints());
+  g->SetPoints(normals);
   
   //add the edge weight array to the graph
   g->GetEdgeData()->AddArray(weights);
@@ -136,7 +145,7 @@ int vtkKNNGraphFilter::RequestData(vtkInformation *vtkNotUsed(request),
   output->ShallowCopy(g);
   
   //why doesn't MST preserve points??
-  output->SetPoints(input->GetPoints());
+  output->SetPoints(normals);
   
   return 1;
 }
