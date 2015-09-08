@@ -15,8 +15,9 @@ class vtkPlane;
 
 class vtkPointSetNormalEstimation : public vtkPolyDataAlgorithm
 {
-
   public:
+    enum ModeEnum {FIXED_NUMBER, RADIUS};
+
     static vtkPointSetNormalEstimation *New();
     vtkTypeMacro(vtkPointSetNormalEstimation, vtkPolyDataAlgorithm);
     void PrintSelf(ostream &os, vtkIndent indent);
@@ -42,7 +43,6 @@ class vtkPointSetNormalEstimation : public vtkPolyDataAlgorithm
   private:
     unsigned int NumberOfNeighbors; // The number of neighbors to use in constructing the graph.
     float Radius;
-    enum ModeEnum {FIXED_NUMBER, RADIUS};
     ModeEnum Mode;
 
 };
