@@ -101,18 +101,11 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   while(edgeListIterator->HasNext())
     {
     vtkEdgeType Edge = edgeListIterator->Next();
-    //std::cout << "Source: " << Edge.Source << " Target: " << Edge.Target << std::endl;
-    double source[3];
-    double target[3];
-    graph->GetPoints()->GetPoint(Edge.Source, source);
-    graph->GetPoints()->GetPoint(Edge.Target, target);
-
-    //double w = vtkMath::Dot(source, target);
-    double w = 1.0 - fabs(vtkMath::Dot(source, target));
-    //std::cout << "w: " << w << std::endl;
-
-    //naive
-    //double w = 1.0;
+    double sourceNormal[3];
+    double targetNormal[3];
+    input->GetPointData()->GetNormals()->GetTuple(Edge.Source, sourceNormal);
+    input->GetPointData()->GetNormals()->GetTuple(Edge.Target, targetNormal);
+    double w = 1.0 - fabs(vtkMath::Dot(sourceNormal, targetNormal));
     weights->InsertNextValue(w);
     }
 
