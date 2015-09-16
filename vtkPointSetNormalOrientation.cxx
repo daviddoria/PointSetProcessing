@@ -100,13 +100,17 @@ int vtkPointSetNormalOrientation::RequestData(vtkInformation *vtkNotUsed(request
   graph->GetEdges(edgeListIterator);
   while(edgeListIterator->HasNext())
     {
-    vtkEdgeType Edge = edgeListIterator->Next();
-    double sourceNormal[3];
-    double targetNormal[3];
-    input->GetPointData()->GetNormals()->GetTuple(Edge.Source, sourceNormal);
-    input->GetPointData()->GetNormals()->GetTuple(Edge.Target, targetNormal);
-    double w = 1.0 - fabs(vtkMath::Dot(sourceNormal, targetNormal));
-    weights->InsertNextValue(w);
+      vtkEdgeType Edge = edgeListIterator->Next();
+      double sourceNormal[3];
+      double targetNormal[3];
+      input->GetPointData()->GetNormals()->GetTuple(Edge.Source, sourceNormal);
+      input->GetPointData()->GetNormals()->GetTuple(Edge.Target, targetNormal);
+      double w = 1.0 - fabs(vtkMath::Dot(sourceNormal, targetNormal));
+      if (w < 0)
+      {
+        w = 0;
+      }
+      weights->InsertNextValue(w);
     }
 
   // Add the edge weight array to the graph
